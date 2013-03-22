@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<formatdate>dd/MM/yyyy</formatdate>
+	<formatdatehour>dd/MM/yyyy HH:mm:ss</formatdatehour>
+	<startyear>2009</startyear>
+	<ppinotactive>${ppinotactive}</ppinotactive>
+	<ralactive>${ralactive}</ralactive>
+	<engineuri>BpmnEsper</engineuri>
+	<modulespath>bpms-modules</modulespath>
+	<startevent>create</startevent>
+	<assignmentevent>assignment</assignmentevent>
+	<endevent>complete</endevent>
+	<dataobjectupdate>dataobject</dataobjectupdate>
+	<classupdate>class</classupdate>
+	<collectionupdate>collection</collectionupdate>
+	<bpmplatform>activiti</bpmplatform>
+	<organizationurl>${organizationurl}</organizationurl>
+	<organizationowlname>${organizationowlname}</organizationowlname>
+	<backuppath>${backuppath}</backuppath>
+	<tmppath>${tmppath}</tmppath>
+	<basedir>${project.build.directory}/${project.build.finalName}</basedir>
+	<database driver="${database.driverClassName.bpms}" url="${database.url.bpms}" username="${database.user.bpms}" password="${database.password.bpms}"/>
+</config>

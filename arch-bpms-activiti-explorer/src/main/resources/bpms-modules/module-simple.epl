@@ -1,0 +1,37 @@
+module simple;
+
+@Name('ProcessStart1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.ProcessStartListener')
+select * from ProcessStartEvent;
+
+@Name('ProcessEnd1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.ProcessEndListener')
+select * from ProcessEndEvent;
+
+@Name('ActivityStart1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.ActivityStartListener')
+select * from ActivityStartEvent;
+
+@Name('ActivityUserAssignment1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.UserTaskAsignedUserListener')
+select * from UserTaskAsignedUserEvent;
+
+@Name('ActivityEnd1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.ActivityEndListener')
+select * from ActivityEndEvent;
+
+@Name('DataMeasure1')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.DataMeasureListener')
+select processDefId, instanceId, executionId, activityId, time, dataobjectId, 'edad' as property, propertyMap('edad').value as value, propertyMap('edad').type as type from DataobjectEvent(propertyMap('edad').propertyId='edad') where dataobjectId='solicitud';
+
+@Name('DataMeasure2')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.DataMeasureListener')
+select processDefId, instanceId, executionId, activityId, time, dataobjectId, 'descripcion' as property, propertyMap('descripcion').value as value, propertyMap('descripcion').type as type from DataobjectEvent(propertyMap('descripcion').propertyId='descripcion') where dataobjectId='solicitud';
+
+@Name('DataConditionMeasure1_true')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.DataConditionMeasureListener')
+select processDefId, instanceId, executionId, activityId, time, dataobjectId, 'aprobado' as state, true as truth from DataobjectEvent(stateMap('aprobacion').stateId='aprobado') where dataobjectId='solicitud';
+
+@Name('DataConditionMeasure1_false')
+@Tag(name='listeners', value='es.us.isa.bpms.ppinot.listener.DataConditionMeasureListener')
+select processDefId, instanceId, executionId, activityId, time, dataobjectId, 'aprobado' as state, false as truth from DataobjectEvent(stateMap('aprobacion').stateId!='aprobado') where dataobjectId='solicitud';
