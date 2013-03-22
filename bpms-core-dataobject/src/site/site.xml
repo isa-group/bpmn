@@ -1,0 +1,16 @@
+<project name="Proyecto Bpms">
+    <bannerLeft>
+        <name>Proyecto Bpms</name>
+        <src>images/logo.png</src>
+        <href>http://www.isa.us.es</href>
+    </bannerLeft>
+    <body>
+        <menu name="Proyecto Bpms">
+            <item name="Inicio" href="index.html"/>
+            <item name="Docs Bpms" href="javadocs/index.html"/>
+            <item name="Docs para activiti" href="javadocs-activiti/index.html"/>
+            <item name="Docs ejemplo" href="javadocs-example/index.html"/>
+            <item name="Tutorial" href="tutorial.html"/>
+        </menu>
+    </body>
+</project>
