@@ -1,0 +1,167 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.us.isa.bpms</groupId>
+	<artifactId>bpms</artifactId>
+	<version>1.3</version>
+	<packaging>jar</packaging>
+	<name>Data Objects, Esper and RAL for BPM</name>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+  
+	<distributionManagement>
+		<repository>
+			<id>isa.devel.archiva.internal</id>
+			<name>ISA group maven repo</name>
+			<url>http://devel.isa.us.es/archiva/repository/internal/</url>
+		</repository>
+		<site>
+            <id>bpms.website</id>
+             <url>scp://193.147.175.241/var/www/html/tools/${project.artifactId}</url> 
+        </site>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+	        <plugin>            
+	        	<groupId>org.apache.maven.plugins</groupId>            
+	        	<artifactId>maven-source-plugin</artifactId> 
+	        	<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>bundle-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+	        </plugin>
+			
+<!-- 			<plugin> -->
+<!-- 			     <groupId>org.apache.maven.plugins</groupId> -->
+<!-- 			     <artifactId>maven-site-plugin</artifactId>      -->
+<!-- 			     <version>3.0</version>      -->
+<!-- 				 <executions> -->
+<!-- 					 <execution> -->
+<!-- 						<id>site-deployment</id> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>site</goal> -->
+<!-- 							<goal>deploy</goal> -->
+<!-- 						</goals> -->
+<!-- 						 <configuration>  -->
+<!-- 						 	<locales>es</locales> -->
+<!-- 						 	<inputEncoding>UTF-8</inputEncoding> -->
+<!-- 						 	<outputEncoding>UTF-8</outputEncoding> -->
+<!-- 						 </configuration> 				 -->
+<!-- 					 </execution> -->
+<!-- 				 </executions> -->
+<!-- 				 <dependencies> -->
+<!-- 			     	<dependency>              -->
+<!-- 			     		<groupId>org.apache.maven.wagon</groupId>              -->
+<!-- 			     		<artifactId>wagon-ssh</artifactId>              -->
+<!-- 			     		<version>2.0</version>          -->
+<!-- 			     	</dependency>      -->
+<!-- 				</dependencies> -->
+<!-- 			</plugin>  -->
+      
+<!--       		<plugin>         -->
+<!--       			<groupId>org.apache.maven.plugins</groupId>         -->
+<!--       			<artifactId>maven-project-info-reports-plugin</artifactId>         -->
+<!--       			<version>2.4</version>         -->
+<!--       		</plugin> -->
+      					
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-javadoc-plugin</artifactId> -->
+<!-- 				<version>2.8.1</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>bundle-javadocs</id> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>jar</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 				        	<outputDirectory>${basedir}/src/site/resources/javadocs</outputDirectory> -->
+<!-- 		          			<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile> -->
+<!-- 						 	<locales>es</locales> -->
+<!-- 						 	<inputEncoding>UTF-8</inputEncoding> -->
+<!-- 						 	<outputEncoding>UTF-8</outputEncoding> -->
+<!-- 						 	<docencoding>UTF-8</docencoding> -->
+<!-- 							<links> -->
+<!-- 								<link>../javadocs-activiti</link> -->
+<!-- 								<link>../javadocs-example</link> -->
+<!-- 							</links> -->
+<!-- 		 				</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.espertech</groupId>
+			<artifactId>esper</artifactId>
+			<version>4.4.0</version>
+		</dependency>  
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>owlapi</groupId>
+			<artifactId>owlapi</artifactId>
+			<version>3.2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semanticweb</groupId>
+			<artifactId>HermiT</artifactId>
+			<version>1.3.6</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<name>Maven Repository</name>
+			<id>code.berkeleybop.org</id>
+			<url>http://code.berkeleybop.org/maven/repository/</url>
+		</repository>
+		<repository>
+			<id>isa.devel.archiva.internal</id>
+			<name>ISA group maven repo</name>
+			<url>http://devel.isa.us.es/archiva/repository/internal/</url>
+		</repository>
+	</repositories>
+</project>
