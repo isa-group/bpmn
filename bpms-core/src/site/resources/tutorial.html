@@ -1,0 +1,744 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Tutorial. El paquete isabpm</title>
+<link rel="stylesheet" type="text/css" href="css/site.css">
+</head>
+
+<body>
+<div id="header">
+	<div class="activiti-component">
+		<div class="application-info">
+		  	<img src="images/logo.png" height="54px" width="67px"/>
+		</div>
+		<div class="user-info">
+			&nbsp;TUTORIAL: EL PAQUETE ISABPMCENTER v.1.2
+		</div>
+	</div>
+</div>
+<br />
+<p>Dra. Edelia Garc&iacute;a <br />
+Dr. Manuel Resinas <br />
+  Grupo ISA. Diciembre. 2011 </p>
+<h2>&Iacute;ndice</h2>
+<p>1. <a href="#introduccion">Introducci&oacute;n</a></p>
+<p>2. <a href="#software">Software requerido e instalación</a></p>
+<p>3. <a href="#uso">Uso en Activiti</a></p>
+<p>4. <a href="#implementacion">Implementaci&oacute;n de un proceso</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.1. <a href="#analisisydefinir">Análisis del proceso y definici&oacute;n de los dataobjects</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2. <a href="#creardiagrama">Crear el diagrama del proceso</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2.1. <a href="#definirpropiedadesformulario">Definir las propiedades de formularios</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2.2. <a href="#definircondiciones">Definir las condiciones de los conectores de los <em>gateways</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2.3.	<a href="#clasesxmlproceso">Configurar las actividades del tipo <em>service task</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3. <a href="#clasesdataobjects">Crear las clases de los dataobjects</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.1. <a href="#metodosgetyset">Los m&eacute;todos <em>get</em> y <em>set</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.2. <a href="#metodoinit">El m&eacute;todo <em>init</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.3. <a href="#metodovalidate">El m&eacute;todo <em>validate</em></a> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.4. <a href="#estadosdataobject">La anotaci&oacute;n <em>StateViewPoints</em> y los m&eacute;todos <em>is</em></a> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.5. <a href="#metodosupdateinout">Los m&eacute;todos <em>updateIn</em> y <em>updateOut</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.4. <a href="#crearespaciodataobjects">Crear el espacio de dataobjects del proceso</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.4.1. <a href="#anotacionesinicio">Anotaciones al inicio</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.4.2. <a href="#listenersactividades">Listeners de las actividades</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.4.3. <a href="#metodosdirectamente">M&eacute;todos de servicio</a> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.5. <a href="#moduloepl">Crear el m&oacute;dulo EPL del proceso</a></p>
+<p>5. <a href="#integracion">Integraci&oacute;n con otra plataforma BPM</a> </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1. <a href="#implementarinterfaz">Implementar la interfaz <em>PlatformControllerInterface</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2. <a href="#enlazarplataforma">Enlazar la plataforma BPM con la clase <em>IsabpmCenter</em></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.3. <a href="#claseservicetasks">Crear la clase para la configuraci&oacute;n de las <em>service tasks</em></a></p>
+<h2><a name="introduccion" id="introduccion"></a>Introducci&oacute;n</h2>
+<p>El paquete <a target="_blank" href="javadocs"><em>isabpm</em></a> permite estructurar en objetos (<em>dataobjects</em>) la informaci&oacute;n de los procesos, que habitualmente es tratada en las 
+plataformas BPM como variables at&oacute;micas. Adem&aacute;s, permite que se obtenga informaci&oacute;n para calcular indicadores y medidas de la ejecuci&oacute;n 
+  del proceso utilizando la notaci&oacute;n PPINot. Se capturan los eventos de inicio y fin de proceso, inicio y fin de actividades, y modificaciones de 
+propiedades y estados de los dataobjects, que son enviados a Esper (sistema CEP, de procesamiento de eventos complejos) para ser procesados. </p>
+<p>Tiene la ventaja de que la misma implementaci&oacute;n de clases para un proceso, 
+  pueda ser utilizada en diferentes plataformas BPM. El paquete est&aacute; desarrollado en Java y puede ser integrado con cualquier plataforma BPM desarrollada en este lenguaje. Es capaz de reponerse en el caso de fallos en el servidor. </p>
+<p>Conserva en la BD configurada para el paquete, la informaci&oacute;n de las medidas de las instancias de proceso ejecutadas. Las tablas que se crean al efecto son: </p>
+<ul style="list-style-type:none">
+  <li><em>isabpm_process</em> - Relaciona el id del proceso en el diagrama XML con los ids del proceso desplegado en la plataforma BPM.</li>
+  <li><em>isabpm_instance</em> - Conserva las fechas y horas de inicio y fin de las instancias de proceso.</li>
+  <li><em>isabpm_activity</em> - Conserva el nombre de las actividades y su tipo. </li>
+  <li><em>isabpm_activity_event</em> - Conserva las fechas y horas de inicio y fin de las actividades. </li>
+  <li><em>isabpm_dataobject</em> - Conserva el &uacute;ltimo cambio de las propiedades de los dataobjects en cada instancia de proceso. </li>
+  <li><em>isabpm_datacondition</em> - Conserva el &uacute;ltimo cambio de los estados de los dataobjects en cada instancia de proceso.</li>
+</ul>
+<p>Estas tablas son utilizadas por la applicaci&oacute;n web <em>Ppinot Reporter </em> para proporcionar reportes de las medidas y los PPI a partir del XML del proceso o a partir de informaci&oacute;n introducida mediante formularios. </p>
+<p>En este tutorial se explica c&oacute;mo utilizar el paquete <em>isabpm</em> mediante el desarrollo de un ejemplo con Activiti y c&oacute;mo integrarlo con otra plataforma BPM. Se supone que el usuario del paquete est&aacute; familiarizado con Java, Javadocs, Eclipse, BPMN 2.0 y Activiti. Lo más recomendable es utilizar Eclipse Indigo y Maven, con los plugins para desplegar los proyectos local y remotamente; se supone en este caso que el usuario está familiarizado con Maven. Es recomendable apoyarse en el ejemplo durante el estudio.</p>
+<h2><a name="software" id="instalacionyuso"></a>Software requerido e instalación </h2>
+<h3>JDK 5+</h3>
+<p>El paquete IsabpmCenter está implementado en Java  versión 5, y también se necesita para la ejecución de Activiti. Java puede descargarse de <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_top">Oracle Java SE downloads</a>, haciendo click en el botón &quot;Download JDK&quot;.   Las instrucciones de instalación se encuentran en la página. Para comprobar que la instalación se realizó exitosamente, ejecuta <em>java -version</em> en la línea de comandos. Con esto se muestra la versión instalada de  JDK. </p>
+<h3>Eclipse Indigo JEE o Eclipse 3.6.2 con Activiti Designer </h3>
+<p>Como entorno de desarrollo se pueden utilizar Eclipse Helios o Eclipse Indigo JEE. <strong><em>Lo más recomendable es utilizar Eclipse Indigo, con los plugins de Maven</em></strong> para desplegar los proyectos local y remotamente. Ambos se pueden encontrar en <a href="http://www.eclipse.org/downloads/" target="_top">la página de descargas de Eclipse</a>. Descompacta el archivo descargado; entonces ya puedes compenzar a trabajar  el archivo <em>eclipse</em> en la carpeta <em>eclipse</em>. Posteriormente instala en Eclipse el plugin Activiti Designer siguiendo las indicaciones en <a title="Installation" href="http://www.activiti.org/userguide/index.html#activitiDesigner">la guía de usuarios de Activiti</a>. </p>
+<h3>Ant 1.8.1+</h3>
+<p>En el caso que se desee <strong><em>ejecutar Activiti en un servidor independiente</em></strong>, es necesario descargar la última versión estable de Ant desde <a href="http://ant.apache.org/bindownload.cgi" target="_top">la página de descargas de Ant</a>. Descompacta el fichero y asegúrate de que la carpeta <em>bin</em> esté en el camino de tu sistema operativo. Veríficalo ejecutando <em>ant   -version</em> en la línea de comandos. Esto debe mostrar la versión instalada de <em>ant</em>. </p>
+<h3>Activiti 5.8 con IsabpmCenter </h3>
+<p>En el caso que desees utilizar <em><strong>desde Eclipse Indigo el plugin maven-jetty-plugin como servidor local y el plugin cargo-maven2-plugin</strong></em> para desplegar en un servidor remoto, crea un nuevo proyecto Maven con el arquetipo <em>arch-isabpm-activiti-explorer</em>-archetype,  que se puede obtener en el repositorio <a href="http://devel.isa.us.es/archiva/repository/internal/"><em>http://devel.isa.us.es/archiva/repository/internal/</em></a>. En las variables del arquetipo puedes configurar los datos para la conexión a la base de datos y la forma en que deseas que se ejecute <em>isabpm</em>. Con el objetivo <em>mvn package jetty:run</em> puedes ejecutarlo localmente en el puerto 8080 y puedes desplegarlo a un servidor remoto mediante <em>package cargo:deployer-deploy -Denvironment.type=prod</em>. </p>
+<p>Las variables del arquetipo son:</p>
+<p><em>arch-directory-prefix</em> - Prefijo que identifica tu carpeta de backup en el servidor remoto. Debes poner ese mismo prefijo al inicio del id del artefacto cuando crees el proyecto y al nombre de la base de datos.<br />
+  <br />
+  <em>arch-dev-prod-ppinotactive</em> - Indica si Esper estará activo. <br />
+  <em>arch-dev-prod-ralactive</em> -  Indica si se utilizará RAL para la asignación de usuarios a las tareas. <br /><br />
+  <em>arch-dev-database-password</em> - Contraseña de la base de datos de Activiti en el servidor local. <br /><br />
+  <em>arch-prod-backuppath</em> - Camino en el cual se guarda el estado de IsabpmCenter. <br /><br />
+  <em>arch-prod-database-driverClassName</em> - Clase del driver de la base de datos de Activiti en el servidor remoto. <br />
+  <em>arch-prod-database-url</em> - Url para la conexión a la base de datos de Activiti en el servidor remoto.<br />
+  <em>arch-prod-database-user</em> - Usuario de la base de datos de Activiti en el servidor remoto.<br /><br />
+  <em>arch-prod-database-driverClassName-isabpm</em> - Clase del driver de la base de datos de IsabpmCenter en el servidor remoto.<br />
+  <em>arch-prod-database-url-isabpm</em> - Url para la conexión a la base de datos de IsabpmCenter en el servidor remoto.<br />
+  <em>arch-prod-database-user-isabpm</em> - Usuario de la base de datos de IsabpmCenter en el servidor remoto. </p>
+<p>En <em>setting.xml</em> de tu repositorio local de Maven debes configurar los datos de acceso al servidor remoto y la contraseña para la base de datos remota, de la forma que se muestra a continuación.</p>
+<div class="recuadro"><div>
+&lt;?xml version=&quot;1.0&quot;?&gt;<br />
+&lt;settings xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;&gt;<br />
+&nbsp; &lt;servers&gt; <br />
+&nbsp; &nbsp; &lt;server&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;id&gt;isa.devel.archiva.internal&lt;/id&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;username&gt;tu-usuario&lt;/username&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;password&gt;tu-contraseña&lt;/password&gt; <br />
+&nbsp; &nbsp; &lt;/server&gt; <br />
+&nbsp; &nbsp; &lt;server&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;id&gt;isa.devel.sandbox&lt;/id&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;configuration&gt; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;cargo.remote.username&gt;tu-usuario&lt;/cargo.remote.username&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;cargo.remote.password&gt;tu-contraseña&lt;/cargo.remote.password&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;/configuration&gt; <br />
+&nbsp; &nbsp; &lt;/server&gt; <br />
+	&nbsp; &nbsp; &lt;server&gt;<br />
+&nbsp; &nbsp; &nbsp; &lt;id&gt;tu-artifactId.website&lt;/id&gt;<br />
+&nbsp; &nbsp; &nbsp; &lt;username&gt;mvndeployer&lt;/username&gt;<br />
+&nbsp; &nbsp; &nbsp; &lt;password&gt;isa.deployer&lt;/password&gt;<br />
+&nbsp; &nbsp; &lt;/server&gt; <br />
+&nbsp; &lt;/servers&gt; <br />
+&nbsp; &lt;profiles&gt; <br />
+&nbsp; &nbsp; &lt;profile&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;properties&gt; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;environment.type&gt;prod&lt;/environment.type&gt; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;database.password&gt;tu-contraseña&lt;/database.password&gt; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;database.password.isabpm&gt;tu-contraseña&lt;/database.password.isabpm&gt; <br />
+&nbsp; &nbsp; &nbsp; &lt;/properties&gt; <br />
+&nbsp; &nbsp; &lt;/profile&gt; <br />
+&nbsp; &lt;/profiles&gt; <br />
+&lt;/settings&gt; 
+</div></div>
+<p>En el caso que se desee <em><strong>ejecutar Activiti en un servidor independiente</strong></em>, hay que descargar la última versión estable de Activiti de <a href="http://www.activiti.org/download.html">la página de descargas de Activiti</a>, y descargar la actualización de Activiti para IsabpmCenter desde <a href="http://193.147.175.241/tools/isabpm/activiti5.8-isabpm1.2-installer.rar">aquí</a>. Posteriormente deben realizarse los siguientes pasos:</p>
+<ol>
+  <li>Instalar Activiti 5.8 siguiendo las indicaciones en <a title="Installation" href="http://www.activiti.org/userguide/index.html#N1008C">la guía de usuarios de Activiti</a>. </li>
+  <li>Decompactar el archivo descargado <em>activiti5.8-isabpm1.2-installer.rar</em>, en la carpeta <em>webapps</em> del servidor instalado por Activiti y responder afirmativamente cuando se pregunte si se desea sobrescribir. As&iacute; se incluyen en Activiti Explorer los <em>.jar</em> necesarios, el archivo de configuraci&oacute;n y la carpeta <em>isabpm-modules</em>.</li>
+  <li>Crear la BD donde se conservar&aacute; la informaci&oacute;n de las medidas, si no se desea utilizar la BD que trae Activiti por defecto. </li>
+  <li>Configurar en <em>isabpm-bd.cfg.xml</em> la conexi&oacute;n a la BD, si no se desea utilizar la BD que trae Activiti por defecto.</li>
+  <li>Configurar en <em>isabpm-bd.cfg.xml</em> el camino de la carpeta (<em>BACKUPPATH</em>) donde se conservar&aacute; la informaci&oacute;n que permite al sistema reponerse en el caso de fallas del servidor. </li>
+  <li>Asegurarse que <em>BACKUPPATH</em> tiene permiso de escritura. </li>
+</ol>
+<h3>Ppinot Reporter 1.1</h3>
+<p>En el caso que se desee utilizar <strong><em>desde Eclipse Indigo el plugin maven-jetty-plugin como servidor local y el plugin cargo-maven2-plugin</em></strong> para desplegar en un servidor remoto,crea un nuevo proyecto Maven con el arquetipo <em>arch-isabpm-ppinot-reporter</em>-archetype,  que se puede obtener en el repositorio <a href="http://devel.isa.us.es/archiva/repository/internal/"><em>http://devel.isa.us.es/archiva/repository/internal/</em></a>. En las variables del arquetipo puedes configurarlo. Con el objetivo <em>mvn package jetty:run</em> puedes ejecutarlo localmente en el puerto 8080 y puedes desplegarlo a un servidor remoto mediante <em>package cargo:deployer-deploy -Denvironment.type=prod</em>.</p>
+<p>Las variables del arquetipo son:</p>
+<p><em>arch-directory-prefix</em> - Prefijo que identifica tus carpetas en el servidor remoto. Debes poner ese mismo prefijo al inicio del id del artefacto cuando crees el proyecto y al nombre de la base de datos.<br />
+<br />
+    <em>arch-activiti-explorer-artifactId</em> -Id de artefacto del proyecto que creaste con Activiti Explorer y IsabpmCenter. <br /><br />
+    <em>arch-dev-database-password-isabpm</em> - Contraseña de la base de datos local. <br /><br />
+    <em>arch-prod-tmppath</em> - Camino de la carpeta temporal en el servidor remoto. <br />
+    <em>arch-prod-uploadpath</em> - Camino de la carpeta para subir archivos en el servidor remoto. <br /><br />
+    <em>arch-prod-database-driverClassName-isabpm</em> - Clase del driver de la base de datos en el servidor remoto, por ejemplo, <em>h2:tcp</em>. <br />
+    <em>arch-prod-database-url-isabpm</em> - Url para la conexión a la base de datos en el servidor remoto.<br />
+    <em>arch-prod-database-user-isabpm</em>- Usuario de la base de datos en el servidor remoto. </p>
+<p>En el caso que se desee <em><strong>ejecutar Activiti en un servidor independiente</strong></em>, hay que descargar la última versión de Ppinot Reporter desde <a href="http://devel.isa.es.us/svn/proyectos/ppinot/">http://devel.isa.es.us/svn/proyectos/ppinot/</a><a href="http://www.activiti.org/download.html"></a>, despliégalo en tu servidor local y configúralo adecuadamente en <em>ppinotreporter.cfg.xml</em>. </p>
+<h2><a name="uso" id="instalacionyuso"></a>Uso en Activiti</h2>
+<p>Se puede descargar un proyecto de ejemplo con IsabpmCenter 1.2 y Activiti 5.8 desde <a href="http://devel.isa.es.us/svn/proyectos/ppinot/">http://devel.isa.es.us/svn/proyectos/ppinot/</a>. Este proyecto está realizado para Eclipse Indigo . En base a este ejemplo se desarrolla el resto del tutorial. </p>
+<p><strong><em>Si utilizas Eclipse Indigo y Maven</em></strong>, importa el proyecto de ejemplo al espacio de trabajo y despliégalo en tu repositorio local. El proyecto<em> arch-isabpm-activiti-explorer</em> está configurado para desplegar el proceso del ejemplo. En la carpeta <em>deployment</em> está <em>isabpm-example-ppinot-1.2.zip</em> con el que puedes desplegar el proceso en Activiti Explorer. </p>
+<p>Para modelar un nuevo proceso con Activiti Designer, como el proyecto de ejemplo, hay que:</p>
+<ol>
+  <li>Crear un nuevo proyecto Maven con el arquetipo <em>arch-isabpm-activiti-project</em>-archetype,  que se puede obtener en el repositorio <a href="http://devel.isa.us.es/archiva/repository/internal/"><em>http://devel.isa.us.es/archiva/repository/internal/</em></a>.<br />
+  </li>
+  <li><a href="#implementacion">Crear el diagrama, el  paquete y el m&oacute;dulo EPL del proyecto</a>. </li>
+  <li>Modificar el sitio web del proyecto en la carpeta del proyecto <em>src/site</em>. </li>
+  <li>Desplegar el proyecto en Maven (<em>mvn deploy</em>). Con esto se realizan simultáneamente las siguientes acciones: desplegar el .jar y otros artefactos en el repositorio local de Maven y el remoto, crear el artefacto <em>.zip</em> para desplegar el proceso en Activiti Explorer, crear la documentación javadocs y subir el sitio web del proyecto, que incluye el javadocs, al servidor remoto. </li>
+</ol>
+<p>Para ejecutar un proceso en Activiti Explorer hay que realizar lo siguiente: </p>
+<ol>
+  <li>En el <em>pom</em> del proyecto <em> arch-isabpm-activiti-explorer</em>, incluir la dependencia al proyecto creado de manera semejante al recuadro a continuación.</li>
+  <li>Copiar el módulo EPL del proyecto creado en la carpeta <em>src/main/resources/isabpm-modules</em> del proyecto   <em>arch-isabpm-activiti-explorer</em>.</li>
+  <li>Ejecutar el servidor local en el proyecto <em> arch-isabpm-activiti-explorer</em>. </li>
+  <li>Seguir el procedimiento normal para desplegar e iniciar un proceso en Activiti Explorer, con el  <em>.zip</em> que se encuentra en la carpeta <em>deployment</em> del proyecto creado. </li>
+</ol>
+<div class="recuadro"><div>
+&lt;dependency&gt;<br />
+&nbsp;&nbsp;&lt;groupId&gt;es.us.isa.isabpm&lt;/groupId&gt; <br />
+&nbsp;&nbsp;&lt;artifactId&gt;isabpm-example-ppinot&lt;/artifactId&gt; <br />
+&nbsp;&nbsp;&lt;version&gt;1.2&lt;/version&gt; <br />
+&lt;/dependency&gt;<br />
+</div></div>
+<p><em><strong>Si utilizas Eclipse Helios</strong></em>, puedes crear un nuevo proyecto Activiti en este e importar el código fuente y el diagrama del proyecto de ejemplo descargado. Para modelar un nuevo proceso con Activiti Designer, como el proyecto de ejemplo, hay que:</p>
+<ol>
+  <li>Crear un proyecto Activiti.</li>
+  <li>Poner <em>isabpm-1.2.jar</em> y <em>isabpm-activiti-1.2.jar</em> en el <em>build path</em> del proyecto. Se pueden obtener en el repositorio <a href="http://devel.isa.us.es/archiva/repository/internal/"><em>http://devel.isa.us.es/archiva/repository/internal/</em></a>.</li>
+  <li><a href="#implementacion">Crear el diagrama, el  paquete y el m&oacute;dulo EPL del proyecto</a>. </li>
+  <li>Realizar el <em>deployment</em> del proyecto de la manera que se explica  en <a title="Installation" href="http://www.activiti.org/userguide/index.html#eclipseDesignerEditorFeatures">la guía de usuarios de Activiti</a>. </li>
+</ol>
+<p>Si estás <strong><em>utilizando un servidor independiente</em></strong>, para ejecutar un proceso en Activiti Explorer hay que realizar lo siguiente: </p>
+<ol>
+  <li>Detener el servidor. </li>
+  <li>Copiar el m&oacute;dulo EPL del proceso en la carpeta  <em>isabpm-modules</em> creada durante la instalaci&oacute;n en la carpeta de las clases de Activiti Explorer (<em>web-inf/classes</em>). </li>
+  <li>Copiar el <em>.jar</em> del proceso en la carpeta <em>web-inf/lib</em> de Activiti Explorer. </li>
+  <li>Encender el servidor.</li>
+  <li>Seguir el procedimiento normal para desplegar e iniciar un proceso en Activiti Explorer. </li>
+</ol>
+<h2><a name="implementacion" id="implementacion"></a>Implementaci&oacute;n de un proceso </h2>
+<p>Los pasos a seguir para utilizar <em>isabpm</em> al implementar un proceso son los siguientes: </p>
+<ol>
+  <li><a href="#analisisydefinir">An&aacute;lisis del proceso y definici&oacute;n de los dataobjects</a>.</li>
+  <li><a href="#creardiagrama">Crear el diagrama del proceso</a>.</li>
+  <li><a href="#clasesdataobjects">Crear las clases de los dataobjects</a>.</li>
+  <li><a href="#crearespaciodataobjects">Crear el espacio de dataobjects del proceso</a>.</li>
+  <li><a href="#moduloepl">Crear el m&oacute;dulo EPL del proceso</a>.</li>
+</ol>
+<p>A continuaci&oacute;n se detalla c&oacute;mo realizar cada uno de estos pasos tomando como material de estudio el ejemplo. </p>
+<h3><a name="analisisydefinir" id="analisisydefinir"></a>An&aacute;lisis del proceso y definici&oacute;n de los dataobjects</h3>
+<p>En el proceso de ejemplo se realiza lo siguiente:</p>
+<ol>
+  <li> En el evento de inicio se muestra un formulario mediante el cual se obtiene el nombre de usuario al que se le asigna
+    la tarea &quot;Enviar solicitud&quot;.</li>
+  <li> En la tarea &quot;Enviar Solicitud&quot; se le muestra un formulario al usuario indicado, para que introduzca edad, fecha y 
+    descripci&oacute;n de la solicitud.</li>
+  <li>Se valida que la edad de la solicitud sea mayor que 24, en caso que no lo sea se retorna a &quot;Enviar Solicitud&quot; y se 
+    muestra el mensaje de error. Si no hay error se pasa a la tarea &quot;Cambiar descripci&oacute;n a may&uacute;sculas&quot;.</li>
+  <li> En la tarea &quot;Cambiar descripci&oacute;n a may&uacute;sculas&quot; se toma la descripci&oacute;n de la solicitud y se cambia a may&uacute;sculas.</li>
+  <li> La tarea &quot;Aprobar solicitud&quot; est&aacute; asignada al grupo <em>management</em>. En esta se muestra un formulario mediante el cual
+    se puede aprobar o no la solicitud, y opcionalmente indicar un motivo.</li>
+  <li> Si la solicitud es aprobada se termina el proceso, y si no es aprobada se pasa a la tarea &quot;Informar no aprobado&quot;.</li>
+  <li> La tarea &quot;Informar no aprobado&quot; est&aacute; asignada al mismo usuario indicado en el evento de inicio. Muestra un formulario
+    mediante el cual se informa que la solicitud no fue aprobada y los motivos, adem&aacute;s se permite modificar la edad, la 
+  fecha y la descripci&oacute;n de la solicitud, e indicar si se desea reenviar la solicitud o no.</li>
+  <li> Si la solicitud no es reenviada se termina el proceso, en caso contrario se va al paso 3.</li>
+</ol>
+<p>En este proceso de ejemplo se estructuran los datos en dos dataobjects; uno con la informaci&oacute;n de la solicitud 
+  que est&aacute; siendo procesada y otro con el mensaje de error que se puede generar al validar la solicitud. Este &uacute;ltimo
+  no es imprescindible pero se incluye para ilustrar.  <br />
+  <br />
+  El dataobject con la solicitud conserva: </p>
+<ul>
+  <li>El nombre del usuario que realiza la solicitud.</li>
+  <li>La edad.</li>
+  <li>La fecha.</li>
+  <li>La descripci&oacute;n.</li>
+  <li>Si la solicitud est&aacute; aprobada o no.</li>
+  <li>El motivo de la aprobaci&oacute;n o de la no aprobaci&oacute;n.</li>
+</ul>
+<p>El dataobject con el mensaje de error conserva el texto con el mensaje de error; si no hay error, este texto es la cadena vac&iacute;a. </p>
+<p>En el paquete <em>isabpm</em>, cada dataobject tiene un identificador. El databject de la solicitud que est&aacute; siendo procesada tendra el id <em>solicitud</em> y el dataobject con el mensaje de error tendr&aacute; el id <em>mensaje</em>. Estos identificadores son asignados cuando se <a href="#crearespaciodataobjects">adicionan los dataobjects al espacio de dataobjects del proceso</a>; pero desde ya se puede asumir que los tendr&aacute;n y utilizarlos en el diagrama del proceso. </p>
+<h3><a name="creardiagrama" id="creardiagrama"></a>Crear el diagrama del proceso</h3>
+<p> El XML del proceso se encuentra en la carpeta <em>isabpm-example-ppinot/src/main/resources/diagram</em> y el  diagrama del proceso es el que se muestra a continuaci&oacute;n. En el diagrama se utilizan los dataobjects en los formularios y en las condiciones de los conectores que parten de los <em>gateways</em>, y se configuran  las tareas del tipo <em>service task</em> con una clase proporcionada en el paquete <em>isabpm</em> . </p>
+<p> <img name="imageField" src="images/simple.png" alt="Diagrama del proceso de ejemplo" /></p>
+<h4><a name="definirpropiedadesformulario" id="definirpropiedadesformulario"></a>Definir las propiedades de formularios</h4>
+<p>En  los campos de lectura de los formularios en Activiti hay que utilizar variables at&oacute;micas, que en lo adelante ser&aacute;n llamadas <em>variables de la plataforma</em>, por lo tanto para utilizar dataobjects hay que garantizar que:</p>
+<ul>
+  <li>Cuando el usuario complete un formulario se actualicen las propiedades de los dataobjects relacionados con ese formulario, a partir de las variables de la plataforma utilizadas en el formulario.</li>
+  <li>Cuando se modifique un dataobject en alg&uacute;n evento del proceso se actualicen las variables de la plataforma relacionadas con este, a partir del valor de las propiedades en el dataobject. </li>
+</ul>
+<p>Con isabpm se realizan estas actualizaciones autom&aacute;ticamente teniendo en cuenta las <a href="#anotacionesinicio">declaraciones  en el paquete del proceso</a>. </p>
+<p>En los campos que no son de lectura se puede hacer referencia directamente a las propiedades de los dataobjects. Para esto con el paquete <em>isabpm</em> cada dataobject est&aacute; asignado a una variable cuyo nombre es el id del dataobject. Entonces, se puede tener acceso a las propiedades de los dataobjects <em>solicitud</em> y <em>mensaje</em> a trav&eacute;s de las variables <em>solicitud</em> y <em>mensaje</em>, respectivamente. Mediante estas variables se pueden mostrar en los formularios los valores de las propiedades de los dataobjects, por ejemplo, la propiedad <em>texto</em> del dataobject <em>mensaje</em> se puede mostrar de la siguiente 
+manera <em>#{mensaje.texto}</em>. En lo adelante se har&aacute; referencia a estas variables como <em>variables de dataobject</em>.</p>
+<p>Las propiedades de los dataobjects, las variables de la plataforma y las variables de dataobjects son actualizadas autom&aacute;ticamente en los eventos de inicio y fin de actividades de acuerdo a lo indicado en el <a href="#crearespaciodataobjects">espacio de dataobjects del proceso</a>. </p>
+<p>Teniendo en cuenta lo explicado anteriormente, el c&oacute;digo XML de una tarea puede quedar de la siguiente manera:</p>
+<div class="recuadro"><div>
+&lt;userTask id=&quot;<strong>usertask2</strong>&quot; name=&quot;<strong>Enviar solicitud</strong>&quot; activiti:assignee=&quot;<strong>${nombre}</strong>"><br />
+&nbsp; &lt;extensionElements&gt;<br />
+&nbsp;&nbsp; &lt;activiti:formProperty id=&quot;<strong>mensaje</strong>&quot; name=&quot;<strong>Mensaje</strong>&quot;   expression=&quot;<strong>#{mensaje.texto}</strong>&quot; readable=&quot;<strong>true</strong>&quot;   writable=&quot;<strong>false</strong>&quot; /&gt; <br />
+&nbsp;&nbsp; &lt;activiti:formProperty id=&quot;<strong>edad</strong>&quot; name=&quot;<strong>Edad</strong>&quot;   type=&quot;<strong>long</strong>&quot; required=&quot;<strong>true</strong>&quot; readable=&quot;<strong>true</strong>&quot;   writable=&quot;<strong>true</strong>&quot; /&gt; <br />
+&nbsp;&nbsp; &lt;activiti:formProperty id=&quot;<strong>fecha</strong>&quot; name=&quot;<strong>Fecha</strong>&quot;   type=&quot;<strong>date</strong>&quot; required=&quot;<strong>true</strong>&quot; readable=&quot;<strong>true</strong>&quot;   writable=&quot;<strong>true</strong>&quot; /&gt; <br />
+&nbsp;&nbsp; &lt;activiti:formProperty id=&quot;<strong>descripcion</strong>&quot; name=&quot;<strong>Descripci&oacute;n</strong>&quot;   type=&quot;<strong>string</strong>&quot; required=&quot;<strong>true</strong>&quot; readable=&quot;<strong>true</strong>&quot;   writable=&quot;<strong>true</strong>&quot; /&gt; <br />
+&nbsp; &lt;/extensionElements&gt;<br />
+&lt;/userTask&gt;
+</div></div>
+<p>Esta es la tarea &quot;Enviar solicitud&quot; en el proceso del ejemplo. La variable de la plataforma <em>nombre</em> toma valor en el formulario del evento de inicio del proceso y permite  asignar la tarea &quot;Enviar solicitud&quot; al usuario indicado por el usuario. En el campo <em>Mensaje</em>  se muestra el mensaje de error si es que lo hay. Esto puede ocurrir cuando se retorna a esta tarea desde <em>exclusivegateway1</em>, como puede verse en el pr&oacute;ximo ep&iacute;grafe <a href="#listenersactividades"></a>. En el resto de los campos se leen valores de propiedades del dataobject <em>solicitud</em> mediante las variables de plataforma que tiene asociadas. </p>
+<h4><a name="definircondiciones" id="definircondiciones"></a>Definir las condiciones de los conectores de los gateways</h4>
+<p>Las variables de dataobjects tambi&eacute;n  se pueden utilizar en las condiciones de los conectores. Por ejemplo, para verificar si la solicitud no est&aacute; aprobada se puede utilizar la condici&oacute;n <em>${!solicitud.aprobacion}</em>. Esto puede verse  en el siguiente ejemplo, donde se muestra el c&oacute;digo XML del conector que va desde exclusivegateway1 hasta la tarea &quot;Enviar Solicitud&quot; y que detecta si se produjo error al validar el dataobject <em>solicitud</em>.</p>
+<div class="recuadro"><div>
+&lt;sequenceFlow   id=&quot;<strong>flow8</strong>&quot;   name=&quot;<strong></strong>&quot;   sourceRef=&quot;<strong>exclusivegateway1</strong>&quot; targetRef=&quot;<strong>usertask2</strong>"><br />
+&nbsp; &lt;conditionExpression   xsi:type=&quot;<strong>tFormalExpression</strong>"&gt;<br />
+&nbsp;&nbsp;&nbsp; &lt;![CDATA[ #{mensaje.texto!=&quot;&quot;} ]]&gt; <br />
+&nbsp; &lt;/conditionExpression&gt;<br />
+&lt;/sequenceFlow&gt;
+</div></div>
+<p>La validaci&oacute;n del dataobject solicitud se realiza en el <a href="#listenersactividades">evento de fin de la tarea "Enviar Solicitud"</a>.</p>
+<h4><a name="clasesxmlproceso" id="clasesxmlproceso"></a>Configurar las actividades del tipo service task </h4>
+<p>El m&eacute;todo Java que se invoca en las actividades de tipo <em>service tasks</em>, puede ser configurado f&aacute;cilmente. En Activiti este tipo de tareas tienen la propiedad <em>Service Class</em> cuyo valor tiene que ser la referencia a una clase que implemente la interfaz <em>JavaDelegate</em>. Con <em>isabpm</em> en todos los casos a esta propiedad se le da el valor <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/sendevent/ServiceClassCall.html">isabpm.platform.activiti.sendevent.ServiceClassCall</a>. </p>
+<p>En el ejemplo existe la tarea &quot;Cambiar descripci&oacute;n a may&uacute;sculas&quot; que es una <em>Service Task</em>. En el XML esta actividad aparece de la siguiente manera:</p>
+<div class="recuadro">
+  <div> &lt;serviceTask id=&quot;<strong>servicetask1</strong>&quot; name=&quot;<strong>Cambiar   descripci&oacute;n a may&uacute;sculas</strong>&quot;   activiti:class=&quot;<strong>isabpm.platform.activiti.sendevent.ServiceClassCall</strong>&quot; /&gt; </div>
+</div>
+<p>De esta forma se invoca al m&eacute;todo asociado a la tarea <em>servicetask1</em> en el espacio de dataobjects del proceso, como se explica en el ep&iacute;grafe &quot;<a href="#metodosdirectamente">M&eacute;todos de servicio</a>&quot;. </p>
+<h3><a name="clasesdataobjects" id="clasesdataobjects"></a>Crear las clases de los dataobjects</h3>
+<p>Para utilizar <em>isabpm</em>, cada proceso hay que tener un paquete donde se implementen las clases de los dataobjects y los eventos que se ejecutan en el proceso. Este paquete tiene que tener como nombre el identificador del proceso. Esa es la raz&oacute;n por la cual el paquete del ejemplo es <em>simple</em>; ya que el id del diagrama del proceso es <em>simple</em> tambi&eacute;n, lo cual puede verse en el XML del proceso.</p>
+<p>El <em>.jar</em> de ese paquete tiene que ubicarse en la carpeta <em>web-inf/lib</em> de la aplicaci&oacute;n Activiti Modeller, tal como se explic&oacute; en el ep&iacute;grafe &quot;<a href="#instalacionyuso">Instalaci&oacute;n y uso en Activiti</a>&quot;. </p>
+<p>Las clases de los dataobjects van en el subpaquete <em>dataobject</em>. En el <a target="_blank" href="javadocs-example/simple/dataobject/package-summary.html">paquete <em>simple.dataobject</em></a> del ejemplo se encuentran las clases <em>SolicitudObject</em> y <em>MensajeObject</em> de los dataobjects <em>solicitud</em> y <em>mensaje</em>, respectivamente. </p>
+<p>Un dataobject encapsula un conjunto de propiedades que pueden ser tratadas como un todo a trav&eacute;s del proceso, lo que 
+facilita la manipulaci&oacute;n de la informaci&oacute;n, el manteniendo del sistema y su comprensi&oacute;n.
+Las clases de los dataobjects extienden a <a target="_blank" href="javadocs/isabpm/dataobject/DataobjectSpace.html"><em>Dataobject</em></a>, con lo que hereda funcionalidades que permiten dar valor a sus propiedades a partir de variables en la plataforma BPM,
+y viceversa, dar valor a variables de la plataforma a partir de las propiedades del dataobject. Esto es &uacute;til para <a href="#definirpropiedadesformulario">incluir formularios en el proceso</a>. 
+Tambi&eacute;n un dataobject tiene asociado un conjunto de estados que permiten evaluar la situaci&oacute;n en que se encuentra; puede ser evaluado desde diferentes puntos de vistas, cuyos estados sean excluyentes.<br />
+<br />
+La clase de un dataobject puede incluir:</p>
+<ul>
+  <li><a href="#metodosgetyset">Los atributos privados</a> que conservan los valores de las propiedades del dataobject.</li>
+  <li><a href="#metodosgetyset">Los m&eacute;todos <em>get</em></a> para obtener el valor de las propiedades del dataobject.<br />
+  </li>
+  <li><a href="#metodosgetyset">Los m&eacute;todos <em>set</em></a> para dar valor a las propiedades del dataobject. Cada uno de estos m&eacute;todos tiene que registrar
+    el cambio realizado para que se env&iacute;en eventos a Esper antes de actualizar el valor de la propiedad, para lo cual se invoca el m&eacute;todo <em>recordChange</em>.</li>
+  <li><a href="#metodoinit">El m&eacute;todo <em>init</em></a> que inicializa las propiedades del dataobject. </li>
+  <li><a href="#metodovalidate">El m&eacute;todo <em>validate</em></a> que valida el dataobject.</li>
+  <li><a href="#estadosdataobject">Anotaciones <em>StateViewPoints</em> de la clase</a>, que declaren los puntos de vista desde los cuales se eval&uacute;a el estado del
+  dataobject.</li>
+  <li><a href="#estadosdataobject">Los m&eacute;todos <em>is</em></a> que eval&uacute;an estados del dataobject.</li>
+  <li><a href="#metodosupdateinout">Los m&eacute;todos <em>updateIn</em></a> para actualizar el dataobject a partir de variables de la plataforma BPM; cada uno con una 
+    anotaci&oacute;n <em>BPMVariables</em> que indique cu&aacute;les son las variables utilizadas. <br />
+  </li>
+  <li><a href="#metodosupdateinout">Los m&eacute;todos <em>updateOut</em></a> para actualizar variables de la plataforma BPM a partir de las propiedades del dataobject.</li>
+</ul>
+<p>A continuaci&oacute;n se explican cada uno de estos puntos. </p>
+<h4><a name="metodosgetyset" id="metodosgetyset"></a>Los m&eacute;todos get y set</h4>
+<p>Como para la mayor parte de las clases, en los dataobjects hay que definir los atributos privados que conservan los valores de las propiedades del dataobject, los m&eacute;todos <em>get</em> para obtenerlos y los m&eacute;todos <em>set</em> para darles valor. A continuaci&oacute;n se muestran estos elementos para la propiedad <em>nombre</em> del dataobject <em>solicitud</em>:</p>
+<div class="recuadro"><div>
+  /**<br />
+    * El nombre de usuario del solicitante<br />
+    * @serial<br />
+    */<br />
+    private String nombre;<br />
+    <br />
+    /**<br />
+    * Devuelve el valor del atributo nombre: <br />
+    * Nombre de usuario del solicitante.<br />
+    * <br />
+    * @return Valor del atributo<br />
+    */<br />
+    public String getNombre() {<br />
+	<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return this.nombre;<br />
+    }<br />
+    <br />
+    /**<br />
+    * Da valor al atributo nombre: <br />
+    * Nombre de usuario del solicitante.<br />
+    * <br />
+    * @param nombre Valor del atributo<br />
+    */<br />
+    public void setNombre(String newValue) {<br />
+    <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.recordChange(&quot;nombre&quot;, this.getNombre(), newValue);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.nombre = newValue;<br />
+    } 
+</div></div>
+<p>Todos estos elementos se codifican igual que en cualquier clase; tanto los atributos privados, como los m&eacute;todos <em>get</em> y los <em>set</em>. La &uacute;nica cuesti&oacute;n adicional que hay que tener en cuenta y que <strong>es sumamente importante no obviar</strong>, es que cada uno de estos m&eacute;todos hay que registrar
+el cambio realizado para que se env&iacute;en eventos a Esper antes de actualizar el valor de la propiedad, para lo cual se invoca el m&eacute;todo <em>recordChange</em>. Esto puede verse en el m&eacute;todo <em>setNombre</em>, en el cual antes de actualizar el valor del atributo <em>nombre</em> se registra que el valor de esa propiedad cambi&oacute; del valor anterior que ten&iacute;a al actual.</p>
+<h4><a name="metodoinit" id="metodoinit"></a>El m&eacute;todo init</h4>
+<p>Cada dataobject tiene que implementar el m&eacute;todo <em>init</em>, que inicializa las propiedades del dataobject. En el caso de la clase <em>SolicitudObject</em> queda de la siguiente manera:</p>
+<div class="recuadro"><div>
+/**<br />
+* Inicializa el dataobject<br />
+* <br />
+*/<br />
+@Override<br />
+protected void init() {<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setNombre(&quot;&quot;);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setEdad((byte) 0);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setFecha(new Date());<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setDescripcion(&quot;&quot;);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setAprobacion(false);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setMotivo(&quot;&quot;);<br />
+}
+</div></div>
+<h4><a name="metodovalidate" id="metodovalidate"></a>El m&eacute;todo validate</h4>
+<p>Cada dataobject tiene que implementar el m&eacute;todo <em>validate</em>, que valida el dataobject. En el caso que se detecten errores devuelve el mensaje de error y si no los hay devuelve la cadena vac&iacute;a. En el caso de la clase <em>SolicitudObject</em> queda de la siguiente manera:</p>
+<div class="recuadro"><div>
+/**<br />
+* Valida si los atributos de la solicitud cumplen con las condiciones requeridas<br />
+* <br />
+* @return El mensaje de error en caso que se detecte alguno, en caso contrario se devuelve la cadena vac&iacute;a<br />
+*/<br />
+@Override<br />
+public String validate() {<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String error = &quot;&quot;;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ( (Byte) this.getEdad()&lt;24 )<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;error = &quot;La edad tiene que ser mayor o igual que 24&quot;;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return error;<br />
+}
+</div></div>
+<h4><a name="estadosdataobject" id="estadosdataobject"></a>La anotaci&oacute;n <em>StateViewPoints</em> y los m&eacute;todos is  </h4>
+ <p>Con la anotaci&oacute;n <em>StateViewPoints</em> se declaran los puntos de vistas desde los cuales se eval&uacute;an el estado del 
+   dataobject. Para cada uno se indica el id, si se eval&uacute;an los estados desde el inicio o a partir del estado actual,
+   y la lista de los id de los estados que pertenecen al punto de vista. Para cada estado especificado hay que tener un m&eacute;todo <em>is</em> en
+el dataobject. Al inicio de la clase <em>SolicitudObject</em>, se declara:</p>
+ <div class="recuadro"><div>
+ <p>@SuppressWarnings(&quot;serial&quot;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@StateViewPoints({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@SVPoint(id = &quot;aprobacion&quot;, fromBeginning = &quot;true&quot;, states = {&quot;aprobado&quot;, &quot;noAprobado&quot;})<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})
+</div></div>
+</p>
+ <p>Con lo cual se indica que este dataobject es evaluado desde el punto de vista <em>aprobacion</em> el cual tiene dos estados excluyentes: <em>aprobado</em> y <em>noAprobado</em>, y se eval&uacute;a siempre desde el primer estado. En correspondencia con esto, en la clase se definen los m&eacute;todos <em>isAprobado</em> y <em>isNoAprobado</em>, de la siguiente forma:</p>
+<div class="recuadro"><div>
+	/**<br />
+* Eval&uacute;a si el dataobject se encuentra en estado aprobado<br />
+* <br />
+* @return Indica si el dataobject est&aacute; en el estado indicado o no<br />
+*/<br />
+public Boolean isAprobado() {<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return (Boolean) this.getAprobacion();<br />
+}<br />
+<br />
+	/**<br />
+* Eval&uacute;a si el dataobject se encuentra en estado noAprobado<br />
+* <br />
+* @return Indica si el dataobject est&aacute; en el estado indicado o no<br />
+*/<br />
+public Boolean isNoAprobado() {<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return !(Boolean) this.getAprobacion();<br />
+}
+</div></div>
+ <p>Los estados se eval&uacute;an cuando se actualizan las propiedades de los dataobjects a partir de las variables del proceso y cuando se actualizan variables de la plataforma a partir de las propiedades de los dataobjects. Estas actualizaciones se ejecutan seg&uacute;n lo indicado en el <a href="#crearespaciodataobjects">espacio de dataobjects del proceso</a>. </p>
+ <h4><a name="metodosupdateinout" id="metodosupdateinout"></a>Los m&eacute;todos updateIn y updateOut </h4>
+<p>  Algunos de m&eacute;todos <em>updateIn</em> y <em>updateOut</em> definidos en la clase <em>SolicitudObject</em> son:</p>
+<div class="recuadro"><div>
+/**<br />
+* Actualiza propiedades a partir de variables de la plataforma: <br />
+* descripcion, fecha y edad<br />
+* <br />
+*/<br />
+@BPMVariables ({&quot;descripcion&quot;, &quot;fecha&quot;, &quot;edad&quot;})<br />
+public void updateInEnviar(Map&lt;String, Object&gt; variables) {</p>
+ <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setDescripcion((String) variables.get(&quot;descripcion&quot;) );<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setFecha((Date) variables.get(&quot;fecha&quot;) );<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setEdad(((Long) variables.get(&quot;edad&quot;)).byteValue() );<br />
+   }<br />
+   <br />
+/**<br />
+* Devuelve el valor de variables de la plataforma BPM a partir de propiedades: <br />
+* descripcion, fecha y edad<br />
+* <br />
+* @return Mapa con el nombres de las variables y su valor<br />
+*/<br />
+public Map&lt;String, Object&gt; updateOutEnviar() {<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();</p>
+ <p> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.put(&quot;descripcion&quot;, this.getDescripcion());<br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.put(&quot;fecha&quot;, this.getFecha());<br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.put(&quot;edad&quot;, ((Byte) this.getEdad()).longValue());<br />
+  <br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return map;<br />
+   }
+</div></div>
+ <p>Estos m&eacute;todos son utilizados para actualizar el dataobject <em>solicitud</em> y las variables de la plataforma, respectivamente, cuando se completan las actividades &quot;Enviar Solicitud&quot; e &quot;Informar Aprobado&quot; seg&uacute;n lo indicado en el <a href="#crearespaciodataobjects">espacio de dataobjects del proceso</a>.</p>
+ <p>Los m&eacute;todos <em>updateIn</em> y <em>updateOut</em> permiten tratar con las diferencias que puedan existir entre el tipo de las propiedades 
+   del dataobject y el tipo de las variables de la plataforma. Tambi&eacute;n permiten que exista una relaci&oacute;n muchos a muchos
+   entre las propiedades y las variables de la plataforma, es decir, a partir de una o m&aacute;s variables de la plataforma se le puede dar valor a una o m&aacute;s propiedades, y
+viceversa.</p>
+ <p>Los m&eacute;todos <em>updateIn</em> son ejecutados cuando se actualizan propiedades del dataobject a partir de variables de la plataforma. En cada uno ingresa un mapa con los valores de las variables indicadas en su anotaci&oacute;n <em>BPMVariables</em>, a partir del cual se le puede dar valor a las propiedades que se considere, realizando el procesamiento o conversi&oacute;n de tipos que sea necesario. En el caso del ejemplo mostrado, se le da valor a las propiedades <em>descripcion</em>, <em>fecha</em> y <em>edad</em>, a partir de las variables de la plataforma <em>descripcion</em>, <em>fecha</em> y <em>edad</em>, respectivamente.</p>
+ <p>Los m&eacute;todos <em>updateOut</em> son ejecutados cuando se actualizan variables de la plataforma a partir de propiedades del dataobject. En cada uno se devuelve un mapa con los valores de las variables que se desean actualizar. En el caso del ejemplo mostrado, se devuelven los valores que se asignar&aacute;n a las variables <em>descripcion</em>, <em>fecha</em> y <em>edad</em>, a partir de los valores de las propiedades  <em>descripcion</em>, <em>fecha</em> y <em>edad</em>, respectivamente. </p>
+ <h3><a name="crearespaciodataobjects" id="crearespaciodataobjects"></a>Crear el espacio de dataobjects del proceso</h3>
+<p>Para cada proceso hay que crear el espacio de dataobjects del proceso que es una clase que extiende a <a target="_blank" href="javadocs/isabpm/dataobject/DataobjectSpace.html"><em>DataobjectSpace</em></a>. Esta clase  hay que ubicarla en la ra&iacute;z del paquete del proceso, tal como ocurre en el  <a target="_blank" href="javadocs-example/simple/package-summary.html">paquete <em>simple</em></a> del ejemplo. 
+<p>El espacio de dataobjects  es utilizado para implementar los listeners de las 
+  actividades e indicar en qu&eacute; forma se ejecutan en el proceso. 
+  Esta clase tiene que llamarse <a target="_blank" href="javadocs-example/simple/ProcessDataobjectSpace.html"><em>ProcessDataobjectSpace</em></a> y tiene que incluir:
+<ul>
+  <li><a href="#anotacionesinicio">Las anotaciones al inicio de la clase</a> para indicar los dataobjects que se utilizan y la forma en que se actualizan estos y las variables de la plataforma.<br />
+<li><a href="#listenersactividades">Los m&eacute;todos de los listeners de las actividades</a>. Estos tienen anotaciones que
+indican d&oacute;nde se utilizan, con lo que no es necesario hacerlo en el XML del proceso.<br />
+<li><a href="#metodosdirectamente">Los m&eacute;todos de servicio</a> que son utilizados por clases que se referencian directamente en el XML del proceso y que son propias de la plataforma BPM, por ejemplo, las 
+  <em>Service Classes</em> utilizadas en las <em>Service Tasks</em> en Activiti.<br />
+</ul>
+<p>La forma en que se realiza lo anterior se explica en m&aacute;s detalle a continuaci&oacute;n. </p>
+<h4><a name="anotacionesinicio" id="anotacionesinicio"></a>Anotaciones al inicio</h4>
+<p>Como se explic&oacute; en el ep&iacute;grafe &quot;<a href="#definirpropiedadesformulario">Definir las propiedades de formularios</a>&quot;,  la plataforma BPM en los formularios utiliza 
+variables at&oacute;micas a partir de las cuales se actualizan los dataobjects, y por otra parte, si en el c&oacute;digo de los listeners 
+se modifican las propiedades de los dataobjects es necesario posteriormente actualizar las variables de la plataforma. 
+Por lo cual, antes de ejecutar un listener en una actividad hay que actualizar los dataobjects con los valores de 
+variables de la plataforma y despu&eacute;s de ejecutar el listener hay que actualizar las variables de la plataforma 
+con los valores de propiedades de los dataobjects. Para lograr esto, con el paquete <em>isabpm</em> las anotaciones al inicio de la clase indican los dataobjects que se utilizan, y la forma en que se actualizan estos y las variables de la plataforma.</p>
+<p>En el caso del paquete <em>simple</em>, las anotaciones al inicio de la clase <em>ProcessDataobjectSpace</em>  son las siguientes:</p>
+<div class="recuadro"><div>
+@DataobjectClasses({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@DataobjectClass(id = &quot;SolicitudObject&quot;, classref = &quot;simple.dataobject.SolicitudObject&quot;),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@DataobjectClass(id = &quot;MensajeObject&quot;, classref = &quot;simple.dataobject.MensajeObject&quot;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})<br />
+@Dataobjects({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Dataobject(id = &quot;solicitud&quot;, dataobjectclassid = &quot;SolicitudObject&quot;),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Dataobject(id = &quot;mensaje&quot;, dataobjectclassid = &quot;MensajeObject&quot;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})<br />
+@ObjectUpdates({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@ObjectUpdate(activityid = &quot;startevent1&quot;, event = &quot;complete&quot;, updatetype = &quot;dataobject&quot;, id = &quot;solicitud&quot;, updates = { &quot;asignar&quot;&nbsp;}),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@ObjectUpdate(activityid = &quot;usertask2&quot;, event = &quot;complete&quot;, updatetype = &quot;class&quot;, id = &quot;SolicitudObject&quot;, updates = { &quot;enviar&quot; }),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@ObjectUpdate(activityid = &quot;usertask3&quot;, event = &quot;complete&quot;, updatetype = &quot;collection&quot;, id = &quot;solicitudCollection&quot;, updates = { &quot;aprobar&quot; }),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@ObjectUpdate(activityid = &quot;usertask4&quot;, event = &quot;complete&quot;, updatetype = &quot;dataobject&quot;, id = &quot;solicitud&quot;, updates = { &quot;enviar&quot; })<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})<br />
+@VariableUpdates({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@VariableUpdate(activityid = &quot;usertask2&quot;, event = &quot;complete&quot;, updatetype = &quot;dataobject&quot;, id = &quot;mensaje&quot;),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@VariableUpdate(activityid = &quot;usertask4&quot;, event = &quot;complete&quot;, updatetype = &quot;class&quot;, id = &quot;MensajeObject&quot;),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@VariableUpdate(activityid = &quot;servicetask1&quot;, event = &quot;complete&quot;, updatetype = &quot;collection&quot;, id = &quot;solicitudCollection&quot;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})
+</div></div>
+<p>Cada anotaci&oacute;n <em>DataobjectClass</em> declara un identificador para una clase de dataobejct. Con ese identificador se hace 
+  referencia a esa clase en el resto de las anotaciones. Como puede verse, en el caso de la clase <em>simple.dataobject.SolicitudObject</em> su id es <em>SolicitudObject</em>; que posteriormente se utiliza para declarar que hay que actualizar todos los objetos de esa clase al completarse la actividad <em>usertask2</em> que es &quot;Enviar Solicitud&quot;.<br />
+  <br />
+  Cada anotaci&oacute;n <em>Dataobject</em> indica que se cree un dataobject cuando se inicia el proceso. Se indica la clase del dataobject
+  y su id. Por tanto, en este ejemplo al iniarse una instancia de proceso se crean los dataobjects <em>solicitud</em> y <em>mensaje</em>, de las clases <em>simple.dataobject.SolicitudObject</em> y <em>simple.dataobject.MensajeObject</em>, respectivamente. <br />
+  <br />
+  La anotaci&oacute;n <em>ObjectUpdates</em> indica cu&aacute;ndo es que se actualizan los dataobjects a partir de las variables
+  de la plataforma. Cada anotaci&oacute;n <em>ObjectUpdate</em> indica  la actividad y el evento (<em>create</em>, <em>assignment</em> o <em>complete</em>) 
+  en que se realiza esto; indica si se desea actualizar solo un dataobject, todos los dataobjects de una clase, 
+  o todos los dataobjects de una colecci&oacute;n, y cu&aacute;l es el m&eacute;todo <em>updateIn</em> del dataobject se invoca para realizar esto. Es decir, que en el ejemplo, se indica que al completar la actividad <em>startevent1</em> (el evento de inicio del proceso) se ejecute el m&eacute;todo <em>updateInAsignar</em> del dataobject <em>solicitud</em>, que lo que hace es tomar el valor de la variable <em>nombre</em> y asignarlo a la propiedad <em>nombre</em> del dataobject (ver 
+  <a target="_blank" href="javadocs-example/simple/dataobject/SolicitudObject.html">SolicitudObject</a>). <br />
+  <br />
+La anotaci&oacute;n <em>VariableUpdates</em> indica cu&aacute;ndo es que se actualizan las variables de la plataforma a partir de las 
+  propiedades de los dataobjects. Cada anotaci&oacute;n <em>VariableUpdate</em> indica  la actividad y el evento (create, assignment o 
+  complete) en que se realiza esto;  indica si se desea actualizar solo un dataobject, todos los dataobjects de una clase, 
+o todos los dataobjects de una colecci&oacute;n, y cu&aacute;l es el m&eacute;todo <em>updateOut</em> del dataobject se invoca para realizar esto. Es decir, que en el ejemplo, se indica que al completar la tarea <em>usertask2</em>, que es &quot;Enviar Solicitud&quot;, se actualizan variables de la plataforma a partir de las propiedades del dataobject <em>mensaje</em>, con lo cual se ejecutan todos los m&eacute;todos <em>updateOut</em> de <em>mensaje</em>  (ver <a target="_blank" href="javadocs-example/simple/dataobject/MensajeObject.html">MensajeObject</a>). Es necesario hacer esto porque, como se ver&aacute; a continuaci&oacute;n, en el listener que se ejecuta cuando se finaliza esta actividad se valida el dataobject <em>solicitud</em> y el resultado de esa validaci&oacute;n se asigna a la propiedad <em>texto</em> del dataobject <em>mensaje</em>. </p>
+<p>Al crear las anotaciones <em>ObjectUpdates</em> y <em>VariableUpdates</em>, hay que garantizar que cuando se indique que se actualicen los dataobjects de una colecci&oacute;n, previamente ya se hayan adicionado dataobjects a esa colecci&oacute;n; la forma en que puede hacerse aparece en el ep&iacute;grafe &quot;<a href="#metodosdirectamente">M&eacute;todos de servicio</a>&quot;. </p>
+<h4><a name="listenersactividades" id="listenersactividades"></a>Listeners de las actividades</h4>
+<p>El espacio de dataobjects del proceso  <em>ProcessDataobjectSpace</em> implementa m&eacute;todos que se invocan en los listeners de las actividades. Estos tienen anotaciones que
+indican d&oacute;nde se utilizan, con lo que no es necesario indicarlo en el XML del proceso. De esta manera se logra que la implementaci&oacute;n del proceso pueda ser utilizada sin modificaciones en otra plataforma BPM. </p>
+<p>En el caso del ejemplo, se incluye el siguiente listener:</p>
+<div class="recuadro"><div>
+    /**<br />
+* Implementaci&oacute;n para el listener que se invoca cuando se completan las tareas &quot;Enviar Solicitud&quot; e &quot;Informar no aprobado&quot;.<br />
+* Se asocia a estas actividades en tiempo de ejecuci&oacute;n, durante el parse del proceso.<br />
+* <br />
+* La anotaci&oacute;n Listener indica la actividad y el evento en que se invoca el m&eacute;todo (create, assignment o complete)<br />
+* <br />
+* @param object Objeto para interactuar con la plataforma BPM<br />
+*/<br />
+@Listeners({<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Listener(activityid = &quot;usertask2&quot;, event = &quot;complete&quot;),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Listener(activityid = &quot;usertask4&quot;, event = &quot;complete&quot;)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})<br />
+public void lstValidarSolicitud(Object object) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// para ilustrar se incluyen dos formas de obtener el resultado de la validaci&oacute;n de la solicitud <br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// valida la solicitud y, en caso que exista, conserva el mensaje de error en el dataobject Mensaje<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// en el diagrama del proceso es utilizado el dataobject Mensaje en el formulario de la tarea &quot;Enviar Solicitud&quot;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// y en el conector que regresa a esta tarea si la validaci&oacute;n no fue correcta<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((MensajeObject) this.getDataobject(object, &quot;mensaje&quot;)).setTexto(&nbsp;((SolicitudObject) this.getDataobject(object, &quot;solicitud&quot;)).validate() );<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// valida la solicitud y, en caso que exista, conserva el mensaje de error la variable error <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// en el diagrama del proceso se utiliza esta variable en el conector que contin&uacute;a a la tarea &quot;Cambiar descripci&oacute;n <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// a may&uacute;sculas&quot; si la validaci&oacute;n fue correcta<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.setVariable(object, &quot;error&quot;, ((SolicitudObject) this.getDataobject(object, &quot;solicitud&quot;)).validate());<br />
+  }
+</div></div>
+<p>La anotaci&oacute;n <em>Listener</em> indica la actividad y el evento en que se invoca el m&eacute;todo (<em>create</em>, <em>assignment</em> o <em>complete</em>),  que  es asociado a estas actividades en tiempo de ejecuci&oacute;n, durante el parse del proceso. Entonces como puede verse, este es  el listener que se invoca cuando se completan las tareas &quot;Enviar Solicitud&quot; e &quot;Informar no aprobado&quot;. Se asigna el resultado de validar el dataobject <em>solicitud</em> a la propiedad <em>texto</em> del dataobject <em>mensaje</em>, lo que hace posible que  se chequee esta propiedad en la condici&oacute;n del conector que va de <em>exclusivegateway1</em> a <em>usertask2</em>, como se vi&oacute; en el ep&iacute;grafe &quot;<a href="#definircondiciones">Definir las condiciones de los conectores de los gateways</a>&quot;. </p>
+<p>Se accede a los dataobjects mediante el m&eacute;todo <em>getDataobject</em> que se hereda de clase <a target="_blank" href="javadocs/isabpm/dataobject/DataobjectSpace.html"><em>DataobjectSpace</em></a>, al que se le pasan dos argumentos: uno es el objeto que permite interactuar con la plataforma BPM (que es el &uacute;nico argumento de todos los m&eacute;todos listeners, en este caso <em>lstValidarSolicitud</em>), y el otro es el id del dataobject. Una vez que se obtiene el dataobject, se puede utilizar de la misma manera que cualquier objeto, invocando sus m&eacute;todos, como se puede ver en el recuadro superior. </p>
+<p>Como puede verse en la &uacute;ltima instrucci&oacute;n, si es necesario asignar valor a alguna variable de la plataforma BPM directamente desde el listener se puede utilizar el m&eacute;todo <em>setVariable</em> heredado, al cual se le pasan como argumentos: el objeto que permite interactuar con la plataforma BPM, el nombre de la variable y el valor que se le desea asignar. </p>
+<h4><a name="metodosdirectamente" id="metodosdirectamente"></a>M&eacute;todos de servicio </h4>
+<p>Existen clases que se referencian directamente desde el XML del proceso, por ejemplo, las <em>Service Classes</em> utilizadas en las <em>Service Tasks</em> en Activiti. Desde estas clases se pueden invocar m&eacute;todos del espacio de dataobjects del proceso, llamados <em>m&eacute;todos de servicio</em>; logr&aacute;ndose de esta manera que la implementaci&oacute;n del proceso pueda ser utilizada sin modificaciones en otra plataforma BPM.  </p>
+<p>Como se explic&oacute; en el ep&iacute;grafe &quot;<a href="#clasesxmlproceso">Configurar las actividades del tipo service task</a>&quot;, con <em>isabpm</em> en todos los casos a esta propiedad se le da el valor <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/sendevent/ServiceClassCall.html">isabpm.platform.activiti.sendevent.ServiceClassCall</a>. De esta forma se invoca al m&eacute;todo asociado a la tarea <em>servicetask1</em> en el espacio de dataobjects del proceso. Mediante la anotaci&oacute;n <em>Executors</em> es que se asocian las <em>service tasks</em> a m&eacute;todos en el espacio de dataobjects, como puede verse en el recuadro a continuaci&oacute;n. </p>
+<div class="recuadro"><div>
+/**<br />
+ * Implementaci&oacute;n para la clase que se invoca en la tarea "Cambiar descripci&oacute;n a may&uacute;sculas".<br />
+ * Tiene la anotaci&oacute;n:<br />
+ * &#064<a target="_blank" href="javadocs/isabpm/dataobject/annotations/ServiceTasks.html">ServiceTasks</a>({<br>
+ * 	&nbsp&nbsp&#064ServiceTask("servicetask1")<br />
+ * })<br>
+ * <br />
+ * @param object Objeto para interactuar con la plataforma BPM<br />
+ */<br />
+@ServiceTasks({<br />
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@ServiceTask("servicetask1")<br />
+})<br />
+public void accChangeToUppercase(Object object) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// cambia la descripci&oacute;n de la solicitud a may&uacute;sculas<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolicitudObject solicitud = (SolicitudObject) this.getDataobject(object, &quot;solicitud&quot; );<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solicitud.setDescripcion( solicitud.getDescripcion().toUpperCase() ); <br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// para ilustrar se adicionan los dataobjects a colecciones<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// estas colecciones son utilizadas posteriormente para actualizar los dataobjects; lo cual se especifica en las<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// anotaciones de la clase<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.addToCollection(object, &quot;solicitud&quot;, &quot;solicitudCollection&quot;);<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.addToCollection(object, &quot;mensaje&quot;, &quot;mensajeCollection&quot;);<br />
+  }<br />
+</div></div>
+<p>Al igual que los listeners estos los m&eacute;todos de servicio tienen como &uacute;nico argumento el objeto que permite interactuar con la plataforma BPM.</p>
+<p>En el m&eacute;todo 
+<em>accChangeToUppercase</em> se cambia a may&uacute;sculas la descripci&oacute;n del dataobject <em>solicitud</em>, y se adiciona este dataobject a la colecci&oacute;n <em>solicitudCollection</em>, es por esto que se puede indicar en las anotaciones al inicio de <em>ProcessDataobjectSpace</em> que se actualicen las variables de la plataforma a partir de los dataobjects de esa colecci&oacute;n cuando se finaliza la ejecuci&oacute;n de la actividad <em>servicetask1</em>, como pudo verse en el ep&iacute;grafe &quot;<a href="#anotacionesinicio">Anotaciones al inicio</a>&quot;.</p>
+<p>Con lo explicado hasta el momento ya se tienen creados el XML y el paquete del proceso. Solo resta crear el m&oacute;dulo con las declaraciones EPL que permiten que Esper capture las medidas deseadas.</p>
+<h3><a name="moduloepl" id="moduloepl"></a>Crear el m&oacute;dulo EPL del proceso </h3>
+<p> Para cada proceso implementado hay que crear su m&oacute;dulo EPL con las declaraciones que indican a Esper qu&eacute; eventos tiene que capturar y a qu&eacute; listeners 
+enviarlos. El nombre del archivo tiene que ser: </p>
+<p>&quot;module-&quot; + id-del-proceso + &quot;.epl&quot;</p>
+<p>Este archivo tiene que estar en la carpeta
+  de las clases, en la subcarpeta <em>isabpm-modules</em>. <br />
+    <br />
+  En los m&oacute;dulos EPL, las declaraciones siguen patrones, uno para cada medida de proceso. As&iacute; mismo cada medida tiene un listener y cada uno conserva en la BD configurada para el paquete, la informaci&oacute;n de las medidas. 
+  Los listeners est&aacute;n en el paquete <a target="_blank" href="javadocs/isabpm/esper/listener/package-summary.html"><em>isabpm.esper.listener</em></a>. 
+  Si no se desea que se env&iacute;en eventos a Esper se puede desactivar en <em>isabpm.cfg.properties</em>, que se encuentra en la carpeta 
+de las clases. La propiedad a modificar es <em>PPINOTACTIVE</em>.</p>
+<p>A continuaci&oacute;n se muestra el m&oacute;dulo EPL del proceso <em>simple</em>. El archivo correspondiente se puede crear en la aplicación Ppinot Reporter en la opción &quot;Administrar XML&quot;. </p>
+<div class="recuadro"><div>
+<p>module esper.ejemplo1;</p>
+<p>@Name('ProcessStart1')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.ProcessStartListener')<br />
+  select * from ProcessStartEvent;</p>
+<p>@Name('ProcessEnd1')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.ProcessEndListener')<br />
+  select * from ProcessEndEvent;</p>
+<p>@Name(&aacute;ctivityStart1')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.ActivityStartListener')<br />
+  select * from ActivityStartEvent;</p>
+<p>@Name(&aacute;ctivityEnd1')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.ActivityEndListener')<br />
+  select * from ActivityEndEvent;</p>
+<p>@Name('DataMeasure1')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.DataMeasureListener')<br />
+  select processId, instanceId, executionId, time, dataobjectId, 'edad' as property, propertyMap('edad').value as value, propertyMap('edad').type as type from DataobjectEvent(propertyMap('edad').propertyId='edad') where dataobjectId='solicitud';</p>
+<p>@Name('DataMeasure2')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.DataMeasureListener')<br />
+  select processId, instanceId, executionId, time, dataobjectId, 'descripcion' as property, propertyMap('descripcion').value as value, propertyMap('descripcion').type as type from DataobjectEvent(propertyMap('descripcion').propertyId='descripcion') where dataobjectId='solicitud';</p>
+<p>@Name('DataConditionMeasure1_true')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.DataConditionMeasureListener')<br />
+  select processId, instanceId, executionId, time, dataobjectId, &aacute;probado' as state, true as truth from DataobjectEvent(stateMap(&aacute;probacion').stateId=&aacute;probado') where dataobjectId='solicitud';</p>
+<p>@Name('DataConditionMeasure1_false')<br />
+  @Tag(name='listeners', value='isabpm.esper.listener.DataConditionMeasureListener')<br />
+  select processId, instanceId, executionId, time, dataobjectId, &aacute;probado' as state, false as truth from DataobjectEvent(stateMap(&aacute;probacion').stateId!=&aacute;probado') where dataobjectId='solicitud';</p>
+</div></div>
+
+<p>La declaraci&oacute;n <em>ProcessStart1</em> captura el evento de inicio de instancia de proceso <a target="_blank" href="javadocs/isabpm/esper/event/ProcessStartEvent.html"><em>ProcessStartEvent</em></a>, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/ProcessStartListener.html"><em>isabpm.esper.listener.ProcessStartListener</em></a>.</p>
+<p>La declaraci&oacute;n <em>ProcessEnd1</em> captura el evento de fin de instancia de proceso <a target="_blank" href="javadocs/isabpm/esper/event/ProcessEndEvent.html"><em>ProcessEndEvent</em></a>, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/ProcessEndListener.html"><em>isabpm.esper.listener.ProcessEndListener</em></a>.</p>
+<p>La declaraci&oacute;n <em>ActivityStart1</em> captura todos los eventos de inicio de actividad <a target="_blank" href="javadocs/isabpm/esper/event/ActivityStartEvent.html"><em>ActivityStartEvent</em></a>, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/ActivityStartListener.html"><em>isabpm.esper.listener.ActivitiyStartListener</em></a>.</p>
+<p>La declaraci&oacute;n <em>ActivityEnd1</em> captura todos los eventos de fin de actividad <a target="_blank" href="javadocs/isabpm/esper/event/ActivityEndEvent.html"><em>ActivityEndEvent</em></a>, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/ActivityEndListener.html"><em>isabpm.esper.listener.ActivitiyEndListener</em></a>. </p>
+<p>La declaraciones <em>DataMeasure1</em> y  <em>DataMeasure2</em> capturan los eventos de modificaci&oacute;n de dataobjects <a target="_blank" href="javadocs/isabpm/esper/event/DataobjectEvent.html"><em>DataobjectEvent</em></a> en los cuales se haya modificado las propiedades <em>edad</em> y <em>descripcion</em>, respectivamente, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/DataMeasureListener.html"><em>isabpm.esper.listener.DataMeasureListener</em></a>. La diferencia entre ambas es solamente la propiedad detectada. Con lo cual se puede ver que ese es el patr&oacute;n de las <em>DataMeasure</em>, modificando solamente el id de la propiedad. </p>
+<p>Las declaraciones <em>DataConditionMeasure1_true</em> y <em>DataConditionMeasure1_false</em> capturan los eventos de la clase <em>DataobjectEvent</em> en los cuales se haya modificado el estado <em>aprobado</em>, y los dirige al listener <a target="_blank" href="javadocs/isabpm/esper/listener/DataConditionMeasureListener.html"><em>isabpm.esper.listener.DataConditionMeasureListener</em></a>. En la primera se detecta si el dataobject est&aacute; en el estado <em>aprobado</em>, y en la segunda si dej&oacute; de estarlo; por lo cual ambas declaraciones son complementarias y conforman el patr&oacute;n de las <em>DataConditionMeasure</em>, modificando solamente el id del estado. </p>
+<h2><a name="integracion" id="integracion"></a>Integraci&oacute;n con otra plataforma BPM</h2>
+<p>El paquete isabpm puede ser integrado f&aacute;cilmente con cualquier plataforma BPM desarrollada en Java. Para integrar el paquete con una plataforma BPM hay que realizar lo siguiente:</p>
+<ol>
+  <li><a href="#implementarinterfaz">Implementar la interfaz <em>PlatformControllerInterface</em></a>. Esta interfaz declara los m&eacute;todos que permiten realizar operaciones en una plataforma BPM. </li>
+  <li><a href="#enlazarplataforma">Enlazar la plataforma BPM con la clase <em>IsabpmCenter</em></a>, de manera que  la plataforma BPM  comunique a esta clase  cada vez que se produce un evento de inicio y fin de proceso, y de inicio y fin de actividad. </li>
+  <li><a href="#claseservicetasks">Crear la clase para la configuraci&oacute;n de las <em>service tasks</em></a>.</li>
+</ol>
+<p>A continuaci&oacute;n se explican cada uno de estos puntos. </p>
+<h3><a name="implementarinterfaz" id="implementarinterfaz"></a>Implementar la interfaz <em>PlatformControllerInterface</em></h3>
+<p>La interfaz <a target="_blank" href="javadocs/isabpm/platform/PlatformControllerInterface.html"><em>PlatformControllerInterface</em></a> declara los m&eacute;todos que permiten realizar operaciones en una plataforma BPM. Estos m&eacute;todos deben ser implementados en una clase que herede de esta interfaz. Esta clase tiene que llamarse <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/PlatformController.html"><em>PlatformController</em></a> y estar en un paquete cuyo nombre siga el siguiente convenio:</p>
+<p>&quot;isabpm.platform.&quot; + <em>BPMPLATFORM</em> </p>
+<p>Donde <em>BPMPLATFORM</em> es una constante en el archivo de configuraci&oacute;n <em>isabpm.cfg.properties</em>. Un ejemplo de un paquete como este es <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/package-summary.html"><em>isabpm.platform.activiti</em></a>. </p>
+<p>A continuaci&oacute;n puede verse la implementaci&oacute;n de uno de estos m&eacute;todos para Activiti.</p>
+<div class="recuadro"><div>
+/**<br />
+* Devuelve el id de la instancia de proceso que se est&aacute; ejecutando<br />
+* <br />
+* @param object Objeto mediante el cual se interact&uacute;a con Activiti<br />
+* @return Id de instancia de proceso<br />
+*/<br />
+@Override<br />
+public String getInstanceId(Object object) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (object instanceof DelegateTask) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DelegateTask delegateTask = (DelegateTask) object;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return delegateTask.getProcessInstanceId();<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} else<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (object instanceof DelegateExecution) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DelegateExecution delegateExecution = (DelegateExecution) object;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return delegateExecution.getProcessInstanceId();<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} else <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (object instanceof ExecutionEntity) {<br />
+  <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return ((ExecutionEntity) object).getProcessInstanceId();<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} else<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return &quot;&quot;;<br />
+  }
+</div></div>
+<p>Activiti en los m&eacute;todos de sus <em>listener</em> y <em>service classes</em> pasa como argumentos objetos de la clase <em>DelegateTask</em>, <em>DelegateExecution</em> o <em>ExecutionEntity</em>. A su vez el paquete <em>isabpm</em> pasa estos objetos como argumento a los m&eacute;todos de las clase <em>PlatformControllerInterface</em>. Estos objetos son los que permiten interactuar con Activiti en tiempo de ejecuci&oacute;n, y son utilizados, en los m&eacute;todos implementados en la clase <em>PlatformController</em> para devolver los valores requeridos en cada uno de los m&eacute;todos, como puede verse en el ejemplo.</p>
+<p>Estos objetos tambi&eacute;n son pasados a los listeners y m&eacute;todos de servicio del espacio de dataobjects del proceso, como pudo apreciarse en el ep&iacute;grafe &quot;<a href="#crearespaciodataobjects">Crear el espacio de dataobjects del proceso</a>&quot;,  donde son utilizados para obtener dataobjects, adicionarlos a colecciones, etc. </p>
+<h3><a name="enlazarplataforma" id="enlazarplataforma"></a>Enlazar la plataforma BPM con la clase <em>IsabpmCenter</em></h3>
+<p>Hay que enlazar la plataforma BPM con la clase <a target="_blank" href="javadocs/isabpm/IsabpmCenter.html"><em>IsabpmCenter</em></a>, de manera que  la plataforma comunique a esta clase  cada vez que se producen eventos de inicio y fin de proceso, y de inicio y fin de actividad. Para esto <em>IsabpmCenter</em> proporciona los m&eacute;todos <em>executeProcessStartEvent</em>, <em>executeProcessEndSendEvent</em>, <em>executeActivityStartEvent</em> y <em>executeActivityEndSendEvent</em>, respectivamente. </p>
+<p>En el caso de Activiti, se cre&oacute; el paquete <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/sendevent/package-summary.html"><em>isabpm.platform.activiti.sendevent</em></a> con cuatro clases que implementan la interfaz <em>ExecutionListener</em> de Activiti, invocando cada una a uno de los m&eacute;todos de <em>IsabpmCenter</em> mencionados anteriormente. A continuaci&oacute;n se muestra el c&oacute;digo de una de ellas, donde se puede apreciar la forma en que se comunica a <em>IsabpmCenter</em> que se produjo un evento.</p>
+<div class="recuadro">
+/**<br />
+* Ejecuta un evento de fin de actividad.<br />
+* <br />
+* Indica a la clase IsabpmCenter que se ejecute un evento de fin de actividad  (<a href=&quot;../../../IsabpmCenter.html#executeActivityStartSendEvent(java.lang.Object)&quot;>executeActivityStartSendEvent</a>)<br />
+* pasando como par&aacute;metro el objeto que permite interactuar con la plataforma BPM. Para usar el paquete  <a href=&quot;../../../package-summary.html&quot;>isabpm</a><br />
+* con otra plataforma hay que invocar este m&eacute;todo en todas las ocasiones que se completa una actividad. <br />
+* <br />
+* @author Edelia<br />
+* @see IsabpmCenter<br />
+*/<br />
+public class ActivityEndSendEvent implements ExecutionListener {<br />
+   <br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public void notify(DelegateExecution execution) {<br />
+   <br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Ejecuta el evento<br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsabpmCenter.executeActivityEndSendEvent(execution);<br />
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+  }
+</div></div>
+<p>Este es un listener que la clase <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/PpinotParseListener.html"><em>PpinotParseListener</em></a> que hereda de <em>BpmnParseListener</em> de Activiti, adiciona como evento de fin a todas las actividades durante el <em>parse</em> del proceso. Con el resto de las clases en el paquete <em>isabpm.platform.activiti.sendevent</em> realiza lo mismo, de acuerdo al evento al que atiendan. </p>
+<p>Para adicionar <em>PpinotParseListener</em> a los <em>preparsers</em> de Activiti se modific&oacute; en Activiti Explorer el archivo <em>applicationContext.xml</em>, adicion&aacute;ndole el c&oacute;digo que se muestra destacado en rojo a  continuaci&oacute;n.</p>
+<div class="recuadro">
+<strong>...</strong><br />
+<span class="destacado">&lt;bean id=&quot;<strong>ppinotParseListener</strong>&quot;   class=&quot;<strong>isabpm.platform.activiti.PpinotParseListener</strong>&quot; /&gt; </span><br /><br />
+&lt;bean id=&quot;<strong>processEngineConfiguration</strong>&quot; class=&quot;<strong>org.activiti.spring.SpringProcessEngineConfiguration</strong>&quot;&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>dataSource</strong>&quot;   ref=&quot;<strong>dataSource</strong>&quot; /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>transactionManager</strong>&quot;   ref=&quot;<strong>transactionManager</strong>&quot; /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>databaseSchemaUpdate</strong>&quot;   value=&quot;<strong>true</strong>&quot; /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>jobExecutorActivate</strong>&quot;   value=&quot;<strong>true</strong>&quot; /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>customFormTypes</strong>&quot;&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;list&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ref bean=&quot;<strong>userFormType</strong>&quot;   /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/list&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/property&gt;<br /><br />
+<span class="destacado">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;property name=&quot;<strong>customPreBPMNParseListeners</strong>&quot;&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;list&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ref bean=&quot;<strong>ppinotParseListener</strong>&quot;   /&gt; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/list&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/property&gt;</span><br /><br />
+&lt;/bean&gt;<br />
+<strong>...</strong>
+</div>
+<h3><a name="claseservicetasks" id="claseservicetasks"></a>Crear la clase para la configuraci&oacute;n de las <em>service tasks</em></h3>
+<p>En el caso de Activiti se cre&oacute; la clase <a target="_blank" href="javadocs-activiti/isabpm/platform/activiti/sendevent/ServiceClassCall.html">isabpm.platform.activiti.sendevent.ServiceClassCall</a> con la que se configura todas las service tasks, como se explic&oacute; en el ep&iacute;grafe &quot;<a href="#metodosdirectamente">M&eacute;todos de servicio</a>&quot;. A continuaci&oacute;n se muestra el c&oacute;digo de esta clase; en otras plataformas BPM habr&iacute;a que realizar algo semejante. </p>
+<div class="recuadro">
+/**<br />
+ * Ejecuta un m&eacute;todo en una service task.<br />
+ * <br />
+ * Indica a la clase <a target="_blank" href="javadocs/isabpm/IsabpmCenter.html">IsabpmCenter</a> que se ejecute un m&eacute;todo en una service task (<a target="_blank" href="javadocs/isabpm/IsabpmCenter.html#executeServiceClassCall(java.lang.Object)">executeServiceClassCall</a>) <br />
+ * pasando como par&aacute;metro el objeto que permite interactuar con la plataforma BPM. En el caso de Activiti, esta clase se utiliza en <br />
+ * el XML del proceso para configurar la propiedad Service Class en todas las service tasks. En otra plataforma BPM habr&iacute;a que <br />
+ * utilizarlo en una forma semejante. <br />
+ * <br />
+ * @author Edelia<br />
+ * @see isabpm.IsabpmCenter<br />
+ */<br />
+public class ServiceClassCall implements JavaDelegate { <br />
+<br />
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/**<br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Indica a IsabpmCenter que ejecute un m&eacute;todo. Es utilizado en las tareas del tipo service task.<br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Env&iacute;a el mensaje IsabpmCenter.<a target="_blank" href="javadocs/isabpm/IsabpmCenter.html#executeServiceClassCall(java.lang.Object)">ServiceClassCall</a>(execution)<br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* @param execution Objeto que permite interactuar con Activiti en tiempo de ejecuci&oacute;n<br />
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Override<br />
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public void execute(DelegateExecution execution) throws Exception {<br />
+<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Ejecuta el m&eacute;todo <br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsabpmCenter.executeServiceClassCall(execution);<br />
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <br />
+}<br />
+</div>
+<p>&nbsp; </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+
+</html>

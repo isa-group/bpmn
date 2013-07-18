@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar.client">
+    <!--Auto generated ant build file-->
+    <property environment="env"/>
+    <property name="project.base.dir" value="."/>
+    <property name="maven.class.path" value=""/>
+    <property name="name" value="ralWS"/>
+    <property name="src" value="${project.base.dir}/java"/>
+    <property name="test" value="${project.base.dir}/test"/>
+    <property name="build" value="${project.base.dir}/build"/>
+    <property name="classes" value="${build}/classes"/>
+    <property name="lib" value="${build}/lib"/>
+    <property name="resources" value="${project.base.dir}/resources"/>
+    <property name="jars.ok" value=""/>
+    <target name="init">
+        <mkdir dir="${build}"/>
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${lib}"/>
+        <mkdir dir="${test}"/>
+    </target>
+    <target name="pre.compile.test" depends="init">
+        <!--Test the classpath for the availability of necesary classes-->
+        <condition property="jars.ok">
+            <and>
+                <isset property="stax.available"/>
+            </and>
+        </condition>
+        <!--Print out the availabilities-->
+        <echo message="Stax Availability= ${stax.available}"/>
+    </target>
+    <target name="compile.src" depends="pre.compile.test" if="jars.ok">
+        <javac fork="true" memoryInitialSize="256m" memoryMaximumSize="256m" debug="on" destdir="${classes}" srcdir="${src}">
+        </javac>
+    </target>
+    <target name="compile.test" depends="compile.src" if="jars.ok">
+        <javac fork="true" memoryInitialSize="256m" memoryMaximumSize="256m" debug="on" destdir="${classes}">
+            <src path="${test}"/>
+        </javac>
+    </target>
+    <target name="echo.classpath.problem" depends="pre.compile.test" unless="jars.ok">
+        <echo message="The class path is not set right!                                Please make sure the following classes are in the classpath                                1. XmlBeans                                2. Stax                                3. Axis2                 "/>
+    </target>
+    <target name="jar.all" depends="jar.server, jar.client"/>
+    <target name="jar.server" depends="compile.src,echo.classpath.problem" if="jars.ok">
+        <copy toDir="${classes}/META-INF" failonerror="false">
+            <fileset dir="${resources}">
+                <include name="*.xml"/>
+                <include name="*.wsdl"/>
+                <include name="*.xsd"/>
+            </fileset>
+        </copy>
+        <jar destfile="${lib}/${name}.aar">
+            <fileset excludes="**/Test.class" dir="${classes}"/>
+        </jar>
+    </target>
+    <target name="jar.client" if="jars.ok" depends="compile.test">
+        <jar destfile="${lib}/${name}-test-client.jar">
+            <fileset dir="${classes}">
+                <exclude name="**/META-INF/*.*"/>
+                <exclude name="**/lib/*.*"/>
+                <exclude name="**/*MessageReceiver.class"/>
+                <exclude name="**/*Skeleton.class"/>
+            </fileset>
+        </jar>
+    </target>
+    <target name="make.repo" depends="jar.server" if="jars.ok">
+        <mkdir dir="${build}/repo/"/>
+        <mkdir dir="${build}/repo/services"/>
+        <copy file="${build}/lib/${name}.aar" toDir="${build}/repo/services/"/>
+    </target>
+    <target name="start.server" depends="make.repo" if="jars.ok">
+    </target>
+    <target name="run.test" depends="compile.test" if="jars.ok">
+        <path id="test.class.path">
+            <pathelement location="${lib}/${name}-test-client.jar"/>
+            <pathelement location="${classes}"/>
+        </path>
+        <mkdir dir="${build}/test-reports/"/>
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="test.class.path"/>
+            <formatter type="plain"/>
+            <batchtest fork="yes" toDir="${build}/test-reports/">
+                <fileset dir="${test}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    <target name="clean">
+        <delete dir="${build}"/>
+    </target>
+</project>
