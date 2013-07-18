@@ -34,9 +34,19 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP-relationships.owl#mandatory -->
+
+    <owl:ObjectProperty rdf:about="http://www.isa.us.es/ontologies/AbstractBP-relationships.owl#mandatory">
+        <rdfs:subPropertyOf rdf:resource="http://www.isa.us.es/ontologies/AbstractBP-relationships.owl#weakOrder"/>
+        <rdfs:range rdf:resource="&AbstractBP;BPElement"/>
+        <rdfs:domain rdf:resource="&AbstractBP;BPElement"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP-relationships.owl#weakOrder -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;weakOrder">
+    <owl:ObjectProperty rdf:about="http://www.isa.us.es/ontologies/AbstractBP-relationships.owl#weakOrder">
         <rdfs:domain rdf:resource="&AbstractBP;BPElement"/>
         <rdfs:range rdf:resource="&AbstractBP;BPElement"/>
     </owl:ObjectProperty>

@@ -5,7 +5,6 @@
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
-    <!ENTITY bpmn "http://www.isa.us.es/ontologies/bpmn.owl#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
     <!ENTITY AbstractBP "http://www.isa.us.es/ontologies/AbstractBP.owl#" >
 ]>
@@ -17,11 +16,39 @@
      xmlns:AbstractBP="http://www.isa.us.es/ontologies/AbstractBP.owl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:bpmn="http://www.isa.us.es/ontologies/bpmn.owl#">
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://www.isa.us.es/ontologies/bpmn.owl">
         <owl:imports rdf:resource="http://www.isa.us.es/ontologies/AbstractBP.owl"/>
     </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#EndState -->
+
+    <rdf:Description rdf:about="&AbstractBP;EndState">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#failed"/>
+                    <rdf:Description rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#compensated"/>
+                    <rdf:Description rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#completed"/>
+                    <rdf:Description rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#withdrawn"/>
+                    <rdf:Description rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#terminated"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </rdf:Description>
     
 
 
@@ -38,8 +65,9 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#active -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;active">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#active">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;StartState"/>
     </owl:NamedIndividual>
     
@@ -47,8 +75,9 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#compensated -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;compensated">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#compensated">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;EndState"/>
     </owl:NamedIndividual>
     
@@ -56,16 +85,18 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#compensating -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;compensating">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#compensating">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#completed -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;completed">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#completed">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;EndState"/>
     </owl:NamedIndividual>
     
@@ -73,16 +104,18 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#completing -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;completing">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#completing">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#failed -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;failed">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#failed">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;EndState"/>
     </owl:NamedIndividual>
     
@@ -90,24 +123,27 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#failing -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;failing">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#failing">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#ready -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;ready">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#ready">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;BeforeAllocation"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#terminated -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;terminated">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#terminated">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;EndState"/>
     </owl:NamedIndividual>
     
@@ -115,15 +151,16 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#terminating -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;terminating">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#terminating">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
     </owl:NamedIndividual>
     
 
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#triggered -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;triggered">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#triggered">
         <rdf:type rdf:resource="&AbstractBP;EventState"/>
         <rdf:type rdf:resource="&AbstractBP;StartState"/>
     </owl:NamedIndividual>
@@ -132,8 +169,9 @@
 
     <!-- http://www.isa.us.es/ontologies/bpmn.owl#withdrawn -->
 
-    <owl:NamedIndividual rdf:about="&bpmn;withdrawn">
+    <owl:NamedIndividual rdf:about="http://www.isa.us.es/ontologies/bpmn.owl#withdrawn">
         <rdf:type rdf:resource="&AbstractBP;ActivityState"/>
+        <rdf:type rdf:resource="&AbstractBP;AfterAllocation"/>
         <rdf:type rdf:resource="&AbstractBP;EndState"/>
     </owl:NamedIndividual>
 </rdf:RDF>

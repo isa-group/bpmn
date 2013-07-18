@@ -14,6 +14,7 @@
 <rdf:RDF xmlns="http://www.isa.us.es/ontologies/AbstractBP.owl#"
      xml:base="http://www.isa.us.es/ontologies/AbstractBP.owl"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:organization="http://www.isa.us.es/cristal/organization.owl#"
      xmlns:AbstractBP="http://www.isa.us.es/ontologies/AbstractBP.owl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
@@ -44,10 +45,11 @@
     
 
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#belongsToProcessInstance -->
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#dataInput -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;belongsToProcessInstance">
-        <owl:inverseOf rdf:resource="&AbstractBP;hasActivityInstance"/>
+    <owl:ObjectProperty rdf:about="&AbstractBP;dataInput">
+        <rdfs:domain rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:range rdf:resource="&AbstractBP;DataObject"/>
     </owl:ObjectProperty>
     
 
@@ -80,11 +82,30 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasAccountable -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasAccountable">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;hasParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasActivity -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasActivity">
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:domain rdf:resource="&AbstractBP;Process"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;includes"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasActivityInstance -->
 
     <owl:ObjectProperty rdf:about="&AbstractBP;hasActivityInstance">
         <rdfs:range rdf:resource="&AbstractBP;ActivityInstance"/>
         <rdfs:domain rdf:resource="&AbstractBP;ProcessInstance"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;involvesInstance"/>
     </owl:ObjectProperty>
     
 
@@ -98,6 +119,14 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasConsulted -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasConsulted">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;hasParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasDataField -->
 
     <owl:ObjectProperty rdf:about="&AbstractBP;hasDataField">
@@ -107,18 +136,47 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasDataObject -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasDataObject">
+        <rdfs:range rdf:resource="&AbstractBP;DataObject"/>
+        <rdfs:domain rdf:resource="&AbstractBP;Process"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;includes"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasDataObjectInstance -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasDataObjectInstance">
+        <rdfs:range rdf:resource="&AbstractBP;DataObjectInstance"/>
+        <rdfs:domain rdf:resource="&AbstractBP;ProcessInstance"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;involvesInstance"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasInformed -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasInformed">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;hasParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasInstance -->
 
     <owl:ObjectProperty rdf:about="&AbstractBP;hasInstance">
         <rdfs:domain rdf:resource="&AbstractBP;BPElement"/>
         <rdfs:range rdf:resource="&AbstractBP;BPElementInstance"/>
+        <owl:inverseOf rdf:resource="&AbstractBP;isOfType"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasPerformer -->
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasParticipant -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;hasPerformer">
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasParticipant">
         <rdfs:range rdf:resource="&organization;Person"/>
         <rdfs:domain rdf:resource="&AbstractBP;ActivityInstance"/>
     </owl:ObjectProperty>
@@ -134,11 +192,28 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasResponsible -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasResponsible">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;hasParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasState -->
 
     <owl:ObjectProperty rdf:about="&AbstractBP;hasState">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="&AbstractBP;BPElementInstance"/>
         <rdfs:range rdf:resource="&AbstractBP;RuntimeState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#hasSupport -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;hasSupport">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;hasParticipant"/>
     </owl:ObjectProperty>
     
 
@@ -171,30 +246,183 @@
     
 
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPerformerOf -->
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#involvesInstance -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;isPerformerOf">
+    <owl:ObjectProperty rdf:about="&AbstractBP;involvesInstance">
+        <rdfs:range rdf:resource="&AbstractBP;BPElementInstance"/>
+        <rdfs:domain rdf:resource="&AbstractBP;ProcessInstance"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isOfType -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isOfType">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:range rdf:resource="&AbstractBP;BPElement"/>
+        <rdfs:domain rdf:resource="&AbstractBP;BPElementInstance"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialAccountable -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialAccountable">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;isPotentialParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialConsulted -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialConsulted">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;isPotentialParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialInformed -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialInformed">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;isPotentialParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialParticipant -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialParticipant">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialResponsible -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialResponsible">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;isPotentialParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#isPotentialSupport -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;isPotentialSupport">
+        <rdfs:domain rdf:resource="&organization;Person"/>
+        <rdfs:range rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;isPotentialParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#outputDataObject -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;outputDataObject">
+        <rdfs:domain rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:range rdf:resource="&AbstractBP;DataObject"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceAccountable -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceAccountable">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;potentialInstanceParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceConsulted -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceConsulted">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;potentialInstanceParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceInformed -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceInformed">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;potentialInstanceParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceParticipant -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceParticipant">
         <rdfs:domain rdf:resource="&organization;Person"/>
         <rdfs:range rdf:resource="&AbstractBP;ActivityInstance"/>
-        <owl:inverseOf rdf:resource="&AbstractBP;hasPerformer"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#readsDataObjectInstance -->
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceResponsible -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;readsDataObjectInstance">
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceResponsible">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;potentialInstanceParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#potentialInstanceSupport -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;potentialInstanceSupport">
+        <rdfs:subPropertyOf rdf:resource="&AbstractBP;potentialInstanceParticipant"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#reads -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;reads">
         <rdfs:domain rdf:resource="&AbstractBP;ActivityInstance"/>
         <rdfs:range rdf:resource="&AbstractBP;DataObjectInstance"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#writesDataObjectInstance -->
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#readsDataObjectInState -->
 
-    <owl:ObjectProperty rdf:about="&AbstractBP;writesDataObjectInstance">
+    <owl:ObjectProperty rdf:about="&AbstractBP;readsDataObjectInState">
+        <rdfs:domain rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:range rdf:resource="&AbstractBP;DataState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#state -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;state">
+        <rdfs:domain rdf:resource="&AbstractBP;BPElement"/>
+        <rdfs:range rdf:resource="&AbstractBP;RuntimeState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#writes -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;writes">
         <rdfs:domain rdf:resource="&AbstractBP;ActivityInstance"/>
         <rdfs:range rdf:resource="&AbstractBP;DataObjectInstance"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#writesDataObjectInState -->
+
+    <owl:ObjectProperty rdf:about="&AbstractBP;writesDataObjectInState">
+        <rdfs:domain rdf:resource="&AbstractBP;Activity"/>
+        <rdfs:range rdf:resource="&AbstractBP;DataState"/>
     </owl:ObjectProperty>
     
 
@@ -239,6 +467,12 @@
     
 
 
+    <!-- http://www.isa.us.es/cristal/organization.owl#Person -->
+
+    <owl:Class rdf:about="&organization;Person"/>
+    
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#Activity -->
 
     <owl:Class rdf:about="&AbstractBP;Activity">
@@ -252,7 +486,7 @@
     <owl:Class rdf:about="&AbstractBP;ActivityInstance">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&AbstractBP;hasPerformer"/>
+                <owl:onProperty rdf:resource="&AbstractBP;hasParticipant"/>
                 <owl:onClass rdf:resource="&organization;Person"/>
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
@@ -266,6 +500,18 @@
 
     <owl:Class rdf:about="&AbstractBP;ActivityState">
         <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
+        <owl:disjointUnionOf rdf:parseType="Collection">
+            <rdf:Description rdf:about="&AbstractBP;AfterAllocation"/>
+            <rdf:Description rdf:about="&AbstractBP;BeforeAllocation"/>
+        </owl:disjointUnionOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#AfterAllocation -->
+
+    <owl:Class rdf:about="&AbstractBP;AfterAllocation">
+        <rdfs:subClassOf rdf:resource="&AbstractBP;ActivityState"/>
     </owl:Class>
     
 
@@ -280,6 +526,14 @@
 
     <owl:Class rdf:about="&AbstractBP;BPElementInstance">
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#BeforeAllocation -->
+
+    <owl:Class rdf:about="&AbstractBP;BeforeAllocation">
+        <rdfs:subClassOf rdf:resource="&AbstractBP;ActivityState"/>
     </owl:Class>
     
 
@@ -335,13 +589,14 @@
     </owl:Class>
     
 
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#EndState -->
 
     <owl:Class rdf:about="&AbstractBP;EndState">
         <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
         <owl:disjointWith rdf:resource="&AbstractBP;StartState"/>
     </owl:Class>
-
+    
 
 
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#Event -->
@@ -390,22 +645,31 @@
     
 
 
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#NonStartState -->
+
+    <owl:Class rdf:about="&AbstractBP;NonStartState">
+        <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
+    </owl:Class>
+    
+
 
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#Process -->
 
     <owl:Class rdf:about="&AbstractBP;Process"/>
     
 
-    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#ProcessState -->
- 
-    <owl:Class rdf:about="&AbstractBP;ProcessState">
-        <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
-    </owl:Class>
-
 
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#ProcessInstance -->
 
     <owl:Class rdf:about="&AbstractBP;ProcessInstance"/>
+    
+
+
+    <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#ProcessState -->
+
+    <owl:Class rdf:about="&AbstractBP;ProcessState">
+        <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
+    </owl:Class>
     
 
 
@@ -421,14 +685,14 @@
         <rdfs:subClassOf rdf:resource="&AbstractBP;Event"/>
     </owl:Class>
     
+
+
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#StartState -->
 
     <owl:Class rdf:about="&AbstractBP;StartState">
         <rdfs:subClassOf rdf:resource="&AbstractBP;RuntimeState"/>
     </owl:Class>
     
-
-
 
 
     <!-- http://www.isa.us.es/ontologies/AbstractBP.owl#ThrowingIntermediateEvent -->
@@ -482,6 +746,14 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&AbstractBP;EndState"/>
+            <rdf:Description rdf:about="&AbstractBP;NonStartState"/>
+            <rdf:Description rdf:about="&AbstractBP;StartState"/>
+        </owl:members>
+    </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
