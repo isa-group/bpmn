@@ -1,19 +1,13 @@
 package es.us.isa.bpmn.owl.converter;
 
+import es.us.isa.bpmn.handler.ModelHandler;
+import org.semanticweb.owlapi.model.*;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.semanticweb.owlapi.model.AddImport;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-
-import es.us.isa.bpmn.handler.ModelHandleInterface;
-
 /**
- * Clase abstracta de la que heredan las clases que convierten a owl, a partir de los objetos del modelo en un ModelHandleInterface
+ * Clase abstracta de la que heredan las clases que convierten a owl, a partir de los objetos del modelo en un ModelHandler
  * 
  * @author Edelia
  *
@@ -40,13 +34,13 @@ public abstract class ToOWLConverter {
 	}
 
 	/**
-	 * Genera una ontologia OWL a partir de los objetos del modelo en un ModelHandleInterface
+	 * Genera una ontologia OWL a partir de los objetos del modelo en un ModelHandler
 	 * 
 	 * @param modelHandler Manejador de los objetos del modelo
 	 * @return Ontologia OWL
 	 * @throws OWLOntologyCreationException
 	 */
-	public OWLOntology convertToOwlOntology(ModelHandleInterface modelHandler) throws OWLOntologyCreationException {
+	public OWLOntology convertToOwlOntology(ModelHandler modelHandler) throws OWLOntologyCreationException {
 
     	setOntologyURI(getBaseIRI() + modelHandler.getProcId() + ".owl");
     	
@@ -69,12 +63,12 @@ public abstract class ToOWLConverter {
 	}
 	
 	/**
-	 * Ejecuta las operaciones propias de cada subclase para generar la ontologia a partir de un ModelHandleInterface
+	 * Ejecuta las operaciones propias de cada subclase para generar la ontologia a partir de un ModelHandler
 	 * 
-	 * @param modelHandler Objeto ModelHandleInterface a partir del cual se genera la ontologia
+	 * @param modelHandler Objeto ModelHandler a partir del cual se genera la ontologia
 	 * @throws OWLOntologyCreationException
 	 */
-	protected abstract void generateOntology(ModelHandleInterface modelHandler) throws OWLOntologyCreationException;
+	protected abstract void generateOntology(ModelHandler modelHandler) throws OWLOntologyCreationException;
 	
 	/**
 	 * Salva la ontologia generada
@@ -113,7 +107,7 @@ public abstract class ToOWLConverter {
      * Da valor al atributo manager:
      * OWLOntologyManager utilizado
      * 
-     * @param value Valor del atributo
+     * @param manager Valor del atributo
      */
 	public void setManager(OWLOntologyManager manager) {
 		this.manager = manager;
@@ -133,7 +127,7 @@ public abstract class ToOWLConverter {
      * Da valor al atributo baseIRI:
      * IRI de la ontologia creada
      * 
-     * @param value Valor del atributo
+     * @param baseIRI Valor del atributo
      */
 	public void setBaseIRI(String baseIRI) {
 		this.baseIRI = baseIRI;
@@ -153,7 +147,7 @@ public abstract class ToOWLConverter {
      * Da valor al atributo ontology:
      * Ontologia creada
      * 
-     * @param value Valor del atributo
+     * @param ontology Valor del atributo
      */
 	public void setOntology(OWLOntology ontology) {
 		this.ontology = ontology;
@@ -173,7 +167,7 @@ public abstract class ToOWLConverter {
      * Da valor al atributo ontologyURI:
      * URI de la ontologia creada
      * 
-     * @param value Valor del atributo
+     * @param ontologyURI Valor del atributo
      */
 	public void setOntologyURI(String ontologyURI) {
 		this.ontologyURI = ontologyURI;

@@ -1,7 +1,7 @@
 package es.us.isa.bpmn.owl.converter;
 
 import es.us.isa.bpmn.handler.Bpmn20ModelHandler;
-import es.us.isa.bpmn.handler.Bpmn20ModelHandlerInterface;
+import es.us.isa.bpmn.handler.Bpmn20ModelHandlerImpl;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -71,7 +71,7 @@ public class Bpmn2OwlTest {
             String targetPath = targetDir("test-ontologies").getAbsolutePath()+File.separator;
 
 			// importa el xml
-			Bpmn20ModelHandlerInterface modelHandler = new Bpmn20ModelHandler();
+			Bpmn20ModelHandler modelHandler = new Bpmn20ModelHandlerImpl();
 //			modelHandler.load(caminoOrigen, sourceFile);
 			modelHandler.load( getClass().getResourceAsStream(sourceFile) );
 			

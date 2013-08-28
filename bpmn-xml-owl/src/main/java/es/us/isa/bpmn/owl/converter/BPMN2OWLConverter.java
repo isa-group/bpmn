@@ -1,7 +1,7 @@
 package es.us.isa.bpmn.owl.converter;
 
-import es.us.isa.bpmn.handler.Bpmn20ModelHandler;
-import es.us.isa.bpmn.handler.ModelHandleInterface;
+import es.us.isa.bpmn.handler.Bpmn20ModelHandlerImpl;
+import es.us.isa.bpmn.handler.ModelHandler;
 import es.us.isa.bpmn.owl.notation.Vocabulary;
 import es.us.isa.bpmn.xmlClasses.bpmn20.*;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Clases que convierten a owl, a partir de los objetos del modelo en un ModelHandleInterface para BPMN
+ * Clases que convierten a owl, a partir de los objetos del modelo en un ModelHandler para BPMN
  * 
  * @author Edelia
  * 
@@ -37,13 +37,13 @@ public class BPMN2OWLConverter extends ToOWLConverter implements BPMN2OWLConvert
 	}
 	
 	/**
-	 * Ejecuta las operaciones propias de cada subclase para generar la ontologia a partir de un ModelHandleInterface
+	 * Ejecuta las operaciones propias de cada subclase para generar la ontologia a partir de un ModelHandler
 	 * 
-	 * @param modelHandler Objeto ModelHandleInterface a partir del cual se genera la ontologia
+	 * @param modelHandler Objeto ModelHandler a partir del cual se genera la ontologia
 	 * @throws OWLOntologyCreationException
 	 */
     @Override
-	protected void generateOntology(ModelHandleInterface modelHandler) throws OWLOntologyCreationException {
+	protected void generateOntology(ModelHandler modelHandler) throws OWLOntologyCreationException {
     	
     	// adiciona las declaraciones que indican las ontologias importadas en la ontologia generada
     	String[] uris = { Vocabulary.ABSTRACTBP_URI};
@@ -55,7 +55,7 @@ public class BPMN2OWLConverter extends ToOWLConverter implements BPMN2OWLConvert
 				modelHandler.getProcId()); 
 		
     	// inicializaciones
-    	Bpmn20ModelHandler bpmn20ModelHandler = (Bpmn20ModelHandler) modelHandler;
+    	Bpmn20ModelHandlerImpl bpmn20ModelHandler = (Bpmn20ModelHandlerImpl) modelHandler;
 		Map<String, TSequenceFlow> sequenceFlows = bpmn20ModelHandler.getSequenceFlowMap();
 		Map<String, TDataObject> dataObjectList = bpmn20ModelHandler.getDataObjectMap();
 		
