@@ -485,11 +485,23 @@
 
     <owl:Class rdf:about="&AbstractBP;ActivityInstance">
         <owl:equivalentClass>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&AbstractBP;hasParticipant"/>
-                <owl:onClass rdf:resource="&organization;Person"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&AbstractBP;hasResponsible"/>
+                        <owl:someValuesFrom rdf:resource="&organization;Person"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&AbstractBP;hasResponsible"/>
+                        <owl:allValuesFrom rdf:resource="&organization;Person"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&AbstractBP;hasResponsible"/>
+                        <owl:onClass rdf:resource="&organization;Person"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="&AbstractBP;BPElementInstance"/>
     </owl:Class>
@@ -716,7 +728,6 @@
     <owl:Class rdf:about="&AbstractBP;XorGatewayInstance">
         <rdfs:subClassOf rdf:resource="&AbstractBP;GatewayInstance"/>
     </owl:Class>
-    
 
 
     <!-- 
