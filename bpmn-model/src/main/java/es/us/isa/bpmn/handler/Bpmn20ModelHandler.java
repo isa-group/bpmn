@@ -60,4 +60,8 @@ public interface Bpmn20ModelHandler extends ModelHandler {
 	public Map<String, TSubProcess> getSubProcessMap();
 
     TProcess getProcessOfElement(String id);
+
+    TFlowElement getElementById(String id);
+
+    TFlowElement getElementByName(String name);
 }

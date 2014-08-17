@@ -25,6 +25,9 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
 	private Map<String, TGateway> gatewayList;
 	private Map<String, TSubProcess> subProcessList;
 
+    private Map<String, TFlowElement> elementById;
+    private Map<String, TFlowElement> elementByName;
+
 	/**
 	 * Constructor de la clase
 	 */
@@ -40,6 +43,9 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
         exclusiveGtwList = new HashMap<String, TExclusiveGateway>();
         gatewayList = new HashMap<String, TGateway>();
         subProcessList = new HashMap<String, TSubProcess>();
+
+        elementById = new HashMap<String, TFlowElement>();
+        elementByName = new HashMap<String, TFlowElement>();
     }
 	
 	/** 
@@ -169,6 +175,8 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
             TFlowElement contentElement = flowElement.getValue();
 
             processOfElement.put(contentElement.getId(), process);
+            elementById.put(contentElement.getId(), contentElement);
+            elementByName.put(contentElement.getName(), contentElement);
 
             if (contentElement instanceof TStartEvent) {
 
@@ -251,5 +259,15 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
     @Override
     public Collection<String> getProcessId() {
         return processes.keySet();
+    }
+
+    @Override
+    public TFlowElement getElementById(String id) {
+        return elementById.get(id);
+    }
+
+    @Override
+    public TFlowElement getElementByName(String name) {
+        return elementByName.get(name);
     }
 }
