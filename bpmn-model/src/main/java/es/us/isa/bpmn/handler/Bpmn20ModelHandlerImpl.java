@@ -114,14 +114,9 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
                 es.us.isa.bpmn.xmlClasses.bpmndi.ObjectFactory.class};
     }
 
-	/**
-	 * No esta implementado
-	 * 
-	 * @param procId Id del proceso en el xml. Es utilizado para formar el nombre del archivo xml generado
-	 */
 	@Override
-	protected void generateXml(String procId) {
-        throw new UnsupportedOperationException();
+	protected void beforeSave() {
+
     }
 
     public TDefinitions getDefinitions() {
@@ -153,7 +148,7 @@ public class Bpmn20ModelHandlerImpl extends AbstractModelHandler implements Bpmn
 	 * Genera las instancias de clases del modelo a partir de instancias de clases Jabx. 
 	 */
 	@Override
-	protected void generateModel() {
+	protected void afterLoad() {
         for (TProcess p : readProcesses()) {
             this.generateProcessModelLists(p);
             this.processes.put(p.getId(), p);

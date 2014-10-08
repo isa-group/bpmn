@@ -27,16 +27,7 @@ public interface ModelHandler {
      * @return Processes id
      */
     public Collection<String> getProcessId();
-	
-	/**
-	 * Generate model instances from an XML file
-	 *
-	 * @param path File path
-	 * @param file File name
-	 * @throws Exception
-	 */
-	public void load(String path, String file) throws Exception;
-	
+
     /**
 	 * Generate model instances from an XML stream
      * 
@@ -44,25 +35,13 @@ public interface ModelHandler {
      * @throws Exception
      */
 	public void load(InputStream stream) throws Exception;
-	
-	/**
-	 * Saves model instances into an XML file
-	 * 
-	 * @param path Camino
-	 * @param file Nombre del fichero
-	 * @param procId Id del proceso
-	 * @throws Exception
-	 */
-	public void save(String path, String file, String procId) throws Exception;
-	
+
 	/**
 	 * Saves model instances from an XML file
 	 * 
 	 * @param stream
-	 * @param procId Id del proceso
-	 * @throws Exception
 	 */
-	public void save(OutputStream stream, String procId) throws Exception;
+	public void save(OutputStream stream);
 
     /**
      * Returns the element of the model with the given id

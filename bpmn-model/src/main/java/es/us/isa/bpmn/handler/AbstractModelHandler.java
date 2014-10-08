@@ -32,10 +32,9 @@ import java.util.concurrent.Callable;
 @SuppressWarnings("rawtypes")
 public abstract class AbstractModelHandler implements ModelHandler {
 	
-	// Objeto JAXBElement utilizado para manejar el xml
 	private JAXBContext jc;
 	
-	// Objeto JAXBElement que se obtiene del unmarshall de un xml (a partir de un archivo xml obtener clases Jaxb)
+	// XML Root element
 	private JAXBElement element;
 
     private Map<String, Object> elementIds;
@@ -64,9 +63,7 @@ public abstract class AbstractModelHandler implements ModelHandler {
 	 * @param classList Arreglo con las clases para leer y guardar como xml 
 	 */
 	private void xmlConfig(Class[] classList) {
-		
 		try {
-			// crea el JAXBContext para manejar los XML
 			this.jc = JAXBContext.newInstance( classList );
 		} catch (JAXBException e) {
             throw new RuntimeException("Unable to load xml context: " + e);
@@ -101,35 +98,15 @@ public abstract class AbstractModelHandler implements ModelHandler {
 	protected abstract Class[] iniLoader();
 	
 	/**
-	 * Genera las instancias de clases Jaxb a partir de instancias de clases del modelo. 
-	 * Tiene que ser implementado en las subclases.
-	 * Genera el JAXBElement para exportar, por lo que debe finalizar invocando a this.setExportElement
-	 * 
-	 * @param procId Id del proceso en el xml. Es utilizado para formar el nombre del archivo xml generado
+	 * Preprocessing of the model before saving it
 	 */
-	protected abstract void generateXml(String procId);
+	protected abstract void beforeSave();
 	
 	/**
-	 * Genera las instancias de clases del modelo a partir de instancias de clases Jabx. 
-	 * Tiene que ser implementado en las subclases.
-	 * Utiliza el elemento JAXBElement para importar, invocando a this.getExportElement
+	 * Postprocessing of the loaded model.
 	 */
-	protected abstract void generateModel();
-	
-	/**
-	 * Genera las instancias de clases del modelo a partir del xml en un archivo
-	 * 
-	 * @param path Camino del archivo
-	 * @param file Nombre del archivo
-	 * @throws JAXBException
-	 */
-	public void load(String path, String file) throws JAXBException {
-        try {
-            load(new FileInputStream(new File(path, file)));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("File not found: " + path + " - " + file, e);
-        }
-    }
+	protected abstract void afterLoad();
+
 
     /**
 	 * Genera las instancias de clases del modelo a partir del xml en un stream
@@ -138,48 +115,30 @@ public abstract class AbstractModelHandler implements ModelHandler {
      * @throws JAXBException
      */
 	public void load(InputStream stream) throws JAXBException {
-    	
-		// hace el unmarshall a las clases generadas por Jaxb
         Unmarshaller unmarshaller = jc.createUnmarshaller();
-
         unmarshaller.setProperty(com.sun.xml.bind.IDResolver.class.getName(), new MyIDResolver());
 
         this.element =  (JAXBElement<?>) unmarshaller.unmarshal(stream);
 
-        // obtiene los objetos del modelo, a partir de los objetos obtenidos del unmarshall
-        this.generateModel();
+        this.afterLoad();
     }
 
-	/**
-	 * Salva el xml a un archivo, a partir de las instancias de clases del modelo
-	 * 
-	 * @param path Camino
-	 * @param file Nombre del fichero
-	 * @param procId Id del proceso
-	 * @throws JAXBException
-	 */
-	public void save(String path, String file, String procId) throws JAXBException {
-        try {
-            save(new FileOutputStream(new File(path, file)), procId);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("File not found: " + path + " - " + file, e);
-        }
-    }
 
     /**
 	 * Salva el xml a un stream, a partir de las instancias de clases del modelo
 	 * 
 	 * @param stream
-	 * @param procId Id del proceso
-	 * @throws JAXBException
 	 */
-	public void save(OutputStream stream, String procId) throws JAXBException {
+	public void save(OutputStream stream)  {
+        this.beforeSave();
 
-		// genera un objeto del tipo JAXBElement con los objetos que pueden ser exportados a un fichero xml
-    	this.generateXml(procId);
-    	
-    	// exporta el xml a partir del JAXBElement generado
-        this.jc.createMarshaller().marshal( element, stream );
+        try {
+            Marshaller m = jc.createMarshaller();
+            m.marshal(element, stream);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unable to serialize BPNM model", e);
+        }
 	}
 
     public class MyIDResolver extends IDResolver {
