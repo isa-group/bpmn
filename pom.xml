@@ -1,80 +1,90 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<name>BPMN utils</name>
-	<description>Common utilities for handling BPMN models</description>
-	<groupId>es.us.isa.bpmn</groupId>
-	<artifactId>bpmn</artifactId>
+    <groupId>es.us.isa.bpmn</groupId>
+    <artifactId>bpmn</artifactId>
+    <version>2.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    <name>BPMN utils</name>
+    <description>Common utilities for handling BPMN models</description>
+    <url>https://github.com/isa-group/bpmn</url>
+    <inceptionYear>2011</inceptionYear>
+    
+    <organization>
+        <name>Universidad de Sevilla</name>
+        <url>http://www.us.es</url>
+    </organization>
+    
+    <licenses>
+        <license>
+            <name>Apache v2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <id>resinas</id>
+            <name>Manuel Resinas</name>
+            <email>resinas@us.es</email>
+            <url>http://lsi.us.es/~resinas</url>
+            <organization>ISA Research Group</organization>
+            <organizationUrl>www.isa.us.es</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:https://github.com/isa-group/bpmn.git</connection>
+        <developerConnection>scm:git:https://github.com/isa-group/bpmn.git</developerConnection>
+        <url>https://github.com/isa-group/bpmn</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<version>2.1</version>
-	<packaging>pom</packaging>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/isa-group/bpmn/issues</url>
+    </issueManagement>
+    
+    <repositories>
+        <!-- CENTRAL repository -->
+        <repository>
+            <id>central</id>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 
+    <distributionManagement>
+        <!-- Repository for snapshots -->
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <!-- Repository for releases -->
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+    
     <modules>
         <module>bpmn-model</module>
         <module>bpmn-xml-owl</module>
         <module>bp-ontology</module>
-    </modules>    
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
-	<licenses>
-		<license>
-			<name>Apache v2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-		</license>
-	</licenses>
-
-	<organization>
-		<name>Universidad de Sevilla</name>
-		<url>http://www.us.es</url>
-	</organization>
-
-	<scm>
-		<connection>scm:git:https://github.com/isa-group/bpmn.git</connection>
-		<developerConnection>scm:git:https://github.com/isa-group/bpmn.git</developerConnection>
-		<url>https://github.com/isa-group/bpmn</url>
-		<tag>HEAD</tag>
-	</scm>
-
-	<issueManagement>
-		<system>github</system>
-		<url>https://github.com/isa-group/bpmn/issues</url>
-	</issueManagement>
-	
-    <distributionManagement>
-        <snapshotRepository>
-            <id>clinker-snapshots</id>
-            <name>ISA group Snapshots</name>
-            <url>http://clinker.isagroup.es/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>clinker-releases</id>
-            <name>ISA group Releases</name>
-            <url>http://clinker.isagroup.es/nexus/content/repositories/releases</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>es.us.isa</id>
-            <name>ISA group</name>
-            <url>http://clinker.isagroup.es/nexus/content/groups/public</url>
-            <snapshots><enabled>true</enabled></snapshots>            
-        </repository>
-    </repositories>
+    </modules> 
+    
+    <properties>
+        <java.version>1.6</java.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-source-plugin.version>2.4</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -94,16 +104,16 @@
                 <version>3.4.3</version>
             </dependency>
             <dependency>
-                <groupId>org.semanticweb</groupId>
-                <artifactId>HermiT</artifactId>
-                <version>1.3.6</version>
+                <groupId>com.hermit-reasoner</groupId>
+                <artifactId>org.semanticweb.hermit</artifactId>
+                <version>1.3.8.4</version>
                 <exclusions>
                     <exclusion>
                         <groupId>owlapi</groupId>
                         <artifactId>owlapi</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>            
+            </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -112,4 +122,138 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus-staging-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <serverId>nexus-snapshots</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <skipStaging>true</skipStaging>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>bpmn-developer</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>bpmn-release-manager</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>${nexus-staging-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <serverId>nexus-releases</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <skipStaging>true</skipStaging>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <nonavbar>true</nonavbar>
+                            <notree>true</notree>
+                            <nocomment>true</nocomment>
+                            <nohelp>true</nohelp>
+
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>${maven-release-plugin.version}</version>
+                        <configuration>
+                            <tagNameFormat>v@{project.version}</tagNameFormat>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
 </project>

@@ -14,6 +14,7 @@
 
     <properties>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
     </properties>
 
     <dependencies>
@@ -27,11 +28,12 @@
             <artifactId>spring-core</artifactId>
             <version>3.0.0.RELEASE</version>
         </dependency>
-
+        
         <dependency>
-            <groupId>org.semanticweb</groupId>
-            <artifactId>HermiT</artifactId>
+            <groupId>com.hermit-reasoner</groupId>
+            <artifactId>org.semanticweb.hermit</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
@@ -43,4 +45,26 @@
             <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
